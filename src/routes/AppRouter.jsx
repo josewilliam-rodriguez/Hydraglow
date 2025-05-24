@@ -5,7 +5,16 @@ import NavBar from "../components/NavBar";
 import Available from "./Available";
 import Private from "./Private";
 import '../index.css'
+import { createTheme, ThemeProvider } from "@mui/material";
 
+const theme = createTheme({
+  palette: {
+    primary: { main: "#0077b6" }, // Azul personalizado
+    secondary: { main: "#ff5722" }, // Naranja personalizado
+    background: { default: "#f5f5f5", paper: "#ffffff" },
+    success: { main: "#4caf50", dark: "#388e3c" }
+  },
+});
 
 // Lazy loading de componentes
 const NavBarAdmin = lazy(() => import("../components/NavBarAdmin"));
@@ -17,6 +26,7 @@ const AppRouter = () => {
 
   return (
     <BrowserRouter>
+    <ThemeProvider theme={theme}>
       {/* Renderizado condicional del navbar con Suspense */}
       <Suspense fallback={<NavBar />}>
         {loggedInUser?.role === "admin" ? <NavBarAdmin /> : <NavBar />}
@@ -36,6 +46,7 @@ const AppRouter = () => {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Suspense>
+      </ThemeProvider>
     </BrowserRouter>
   );
 };

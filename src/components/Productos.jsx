@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Container,
@@ -11,7 +11,9 @@ import {
   Box,
   Chip,
   Alert,
-  Divider
+  Divider,
+  Button,
+  useTheme
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { fetchProducts, selectAllProducts, selectProductsStatus } from '../redux/slices/productosSlices';
@@ -31,6 +33,53 @@ const Productos = () => {
   const dispatch = useDispatch();
   const products = useSelector(selectAllProducts);
   const status = useSelector(selectProductsStatus);
+  const theme = useTheme();
+
+  const formatPhoneNumber = (phone) => {
+    if (!phone) return null;
+    // Eliminar todo excepto dígitos
+    const cleaned = phone.toString().replace(/\D/g, '');
+    
+    // Si el número ya empieza con 57 (código de Colombia), agregar el +
+    if (cleaned.startsWith('57')) {
+      return '+' + cleaned;
+    }
+    
+    // Si es un número de 10 dígitos sin código, agregar +57
+    if (cleaned.length === 10) {
+      return '+57' + cleaned;
+    }
+    
+    // Si es un número móvil sin 0 al inicio (ej: 3123456789)
+    if (cleaned.length === 9 && !cleaned.startsWith('0')) {
+      return '+57' + cleaned;
+    }
+    
+    // Si no cumple con los formatos esperados, devolverlo limpio
+    return cleaned;
+  };
+
+  const handleWhatsAppRedirect = (product) => {
+    if (!product.contacto) {
+      alert('Este producto no tiene un número de contacto asignado');
+      return;
+    }
+
+    // Formatear el número de teléfono
+    const formattedPhone = formatPhoneNumber(product.contacto);
+    
+    // Validar que el número sea válido
+    if (!formattedPhone.startsWith('+57') || formattedPhone.length < 12) {
+      alert('El número de contacto no es válido. Debe ser un número colombiano de 10 dígitos');
+      return;
+    }
+
+    // Mensaje predefinido con detalles del producto
+    const message = `¡Hola! Estoy interesado en comprar el producto:\n\n*${product.nombre}*\n\n• Categoría: ${product.categoria || 'No especificada'}\n• Precio: $${product.precio?.toLocaleString() || '0'}\n\n${product.descripcion ? `Descripción:\n${product.descripcion}\n\n` : ''}Por favor, indíqueme cómo proceder con la compra.`;
+    
+    // Crear el enlace de WhatsApp
+    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, '_blank');
+  };
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -60,7 +109,7 @@ const Productos = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 4, color:"black" }}>
+      <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 4, color: "black" }}>
         Catálogo de Productos
       </Typography>
       
@@ -75,7 +124,7 @@ const Productos = () => {
       ) : (
         <Grid container spacing={4}>
           {products.map((product) => (
-            <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+            <Grid item key={product.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
               <ProductCard>
                 {product.imagen && (
                   <CardMedia
@@ -109,6 +158,25 @@ const Productos = () => {
                     <Typography variant="caption" color={product.stock > 0 ? 'success.main' : 'error.main'}>
                       {product.stock > 0 ? `Disponible (${product.stock} unidades)` : 'Agotado'}
                     </Typography>
+                  </Box>
+
+                  {/* Botón de WhatsApp */}
+                  <Box mt={3}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      color="success"
+                      size="small"
+                      onClick={() => handleWhatsAppRedirect(product)}
+                      sx={{
+                        backgroundColor: '#25D366',
+                        '&:hover': {
+                          backgroundColor: '#128C7E',
+                        }
+                      }}
+                    >
+                      Comprar por WhatsApp
+                    </Button>
                   </Box>
                 </CardContent>
               </ProductCard>

@@ -1,11 +1,12 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { currentUserSlice } from "./slices/currentUsers";
 import productosSlice from "./slices/productosSlices"
-
+import promocionesReducer from "./slices/promocionesSlices"
 export const store = configureStore({
     reducer: combineReducers({ 
         currentUser: currentUserSlice.reducer,
-        productos: productosSlice 
+        productos: productosSlice,
+        promociones: promocionesReducer
     }),
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

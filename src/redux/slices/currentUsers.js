@@ -85,6 +85,7 @@ export const emailRegister = (data) => async (dispatch) => {
       displayName: data.nombre || user.displayName,
       email: user.email,
       uid: user.uid,
+      contacto: user.contacto,
       role: "user", // Rol por defecto
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString()
