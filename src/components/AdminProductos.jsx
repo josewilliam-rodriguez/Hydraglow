@@ -17,8 +17,13 @@ import {
   Alert,
   Box,
   Tooltip,
+  useTheme,
 } from "@mui/material";
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import {
   addProduct,
   deleteProduct,
@@ -34,6 +39,7 @@ const AdminProductos = () => {
   const products = useSelector(selectAllProducts);
   const status = useSelector(selectProductsStatus);
   const [openDialog, setOpenDialog] = useState(false);
+  const theme = useTheme();
   const [currentProduct, setCurrentProduct] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -132,7 +138,11 @@ const AdminProductos = () => {
         alignItems="center"
         ms={4}
       >
-        <Typography variant="h4" component="h1" fontWeight="bold">
+        <Typography variant="h4" component="h1" fontWeight="bold" sx={{
+
+          color: theme.palette.primary.main,
+
+        }} >
           Administración de Productos
         </Typography>
         <Button
@@ -151,49 +161,73 @@ const AdminProductos = () => {
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>
+              <TableCell>Promocion</TableCell>
               <TableCell>Precio</TableCell>
+              <TableCell>Descuento</TableCell>
+              <TableCell>Total con Descuento</TableCell>
               <TableCell>Categoría</TableCell>
               <TableCell>Stock</TableCell>
               <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>{product.nombre}</TableCell>
-                <TableCell
-                  sx={{
-                    maxWidth: 300,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {product.descripcion}
-                </TableCell>
-                <TableCell>${product.precio ? product.precio.toLocaleString() : 'N/A'}</TableCell>
-                <TableCell>{product.categoria || 'N/A'}</TableCell>
-                <TableCell>{product.stock ?? 'N/A'}</TableCell>
-                <TableCell align="center">
-                  <Tooltip title="Editar">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenEdit(product)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(product.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
+            {products.map((product) => {
+              // Calcular el precio con descuento (si aplica)
+              const precioConDescuento = product.porcentajeDescuento
+                ? product.precio * (1 - product.porcentajeDescuento / 100)
+                : product.precio;
+
+              return (
+                <TableRow key={product.id}>
+                  <TableCell>{product.nombre}</TableCell>
+                  <TableCell
+                    sx={{
+                      maxWidth: 300,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {product.descripcion}
+                  </TableCell>
+                  <TableCell>{product.promocion || "N/A"}</TableCell>
+                  <TableCell>
+                    ${product.precio ? product.precio.toLocaleString() : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {product.porcentajeDescuento
+                      ? `${product.porcentajeDescuento}%`
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    $
+                    {precioConDescuento.toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}
+                  </TableCell>
+                  <TableCell>{product.categoria || "N/A"}</TableCell>
+                  <TableCell>{product.stock ?? "N/A"}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="Editar">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleOpenEdit(product)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Eliminar">
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDelete(product.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

@@ -43,7 +43,7 @@ const ValueItem = ({ icon, title, description }) => {
           color: theme.palette.primary.main
         }}
       >
-        {React.cloneElement(icon, { fontSize: 'large' })}
+        {React.cloneElement(icon, { fontSize: 'large', color: 'terciary' })}
       </Box>
       <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
         {title}
@@ -59,7 +59,7 @@ const CompanyValues = () => {
   const values = [
     {
       icon: <CrueltyFree />,
-      title: "Sin Crueldad",
+      title: "Sin Crueldad Animal",
       description: "Nuestros insumos, procesos y productos son sin crueldad animal."
     },
     {

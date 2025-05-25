@@ -66,7 +66,7 @@ const SobreNosotros = () => {
       >
         <Typography
           variant="h3"
-          sx={{ fontWeight: "bold", mb: 1, color: "black" }}
+          sx={{ fontWeight: "bold", mb: 1, color: theme.palette.primary.main }}
         >
           Sobre Nosotros
         </Typography>

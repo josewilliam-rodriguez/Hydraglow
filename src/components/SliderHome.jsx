@@ -11,19 +11,19 @@ const SliderHome = () => {
           image: "https://th.bing.com/th/id/R.0d6bcb347e148d82325214af1356a232?rik=fASvVirccmHt%2bA&riu=http%3a%2f%2fmaquillajestudio.cl%2fwp-content%2fuploads%2f2017%2f09%2fhomemade-hair-conditioner.jpg&ehk=IQ%2b%2fBsWyHaQt98%2fZUE3mwpf0ZeizEQZF8EqRbhsmsfM%3d&risl=&pid=ImgRaw&r=0",
           title: "Productos naturales de alta calidad",
           description: "producto para la piel 100% calificado ",
-          link: "/productos/perros"
+          link: "/Productos"
         },
         {
           image: "https://nanova.org/wp-content/uploads/2024/02/lh95b720.bmp.jpg",
           title: "Gatos felices, dueños tranquilos",
           description: "Alimento especial para gatos exigentes.",
-          link: "/productos/gatos"
+          link: "/Productos"
         },
         {
           image: "https://zaragozatop.com/wp-content/uploads/2023/09/los-beneficios-de-los-productos-naturales-en-los-herbolarios-1.jpg",
           title: "Promociones de la semana",
           description: "No te pierdas nuestras ofertas exclusivas.",
-          link: "/promociones"
+          link: "/Productos"
         }
       ];
       const settings = {
@@ -35,6 +35,16 @@ const SliderHome = () => {
         autoplay: true,
         autoplaySpeed: 4000,
         arrows: false
+      };
+
+            const handlePromoClick = (e, link) => {
+        if (link === "#promociones") {
+          e.preventDefault();
+          const promoSection = document.getElementById('promociones');
+          if (promoSection) {
+            promoSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
       };
     
   return (
@@ -67,6 +77,7 @@ const SliderHome = () => {
               color="primary"
               sx={{ mt: 1 }}
               href={item.link}
+              onClick={(e) => handlePromoClick(e, item.link)}
             >
               Ver más
             </Button>

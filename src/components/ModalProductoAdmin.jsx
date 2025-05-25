@@ -22,9 +22,9 @@ import { getImageURL } from "../helpers/mediaUpload";
 
 // Opciones para los campos de selección
 const lineaOptions = [
-  "cremas hidratantes",
-  "jabones artesanales",
-  "serums faciales",
+  "Aceites faciales y corporal artesanales ",
+  "Mantequillas corporales",
+  "Jabón artesanal canino",
   "otros",
 ];
 const promocionOptions = ["no", "si"];

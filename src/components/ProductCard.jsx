@@ -9,14 +9,9 @@ import {
   Chip,
   Badge,
   useTheme,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import CloseIcon from "@mui/icons-material/Close";
+import ModalDetailProduct from "./ModalDetailProduc";
 
 // Función para formatear como COP
 const formatCOP = (value) => {
@@ -70,13 +65,6 @@ const ProductCard = ({ producto, isPromocion = false }) => {
     : precioBase;
   const ahorro = precioBase * (descuento / 100);
 
-  // Función para acortar la descripción
-  const shortenDescription = (text, maxLength = 100) => {
-    if (!text) return "Sin descripción disponible";
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
-  };
-
   const formatPhoneNumber = (phone) => {
     if (!phone) return null;
     const cleaned = phone.toString().replace(/\D/g, "");
@@ -121,71 +109,6 @@ const ProductCard = ({ producto, isPromocion = false }) => {
     );
   };
 
-  const renderUsos = (uso) => {
-    // Caso 1: Campo no existe en absoluto
-    if (uso === undefined || uso === null) {
-      return (
-        <Chip
-          label="No especificada"
-          size="small"
-          color="default"
-          variant="outlined"
-        />
-      );
-    }
-
-    // Caso 2: Campo existe pero es string vacío
-    if (typeof uso === "string" && uso.trim() === "") {
-      return (
-        <Chip
-          label="No especificada"
-          size="small"
-          color="default"
-          variant="outlined"
-        />
-      );
-    }
-
-    // Caso 3: Valor es válido (string no vacío)
-    try {
-      const usosArray = String(uso)
-        .split(/[,|-]/)
-        .map((u) => u.trim())
-        .filter((u) => u.length > 0);
-
-      if (usosArray.length === 0) {
-        return (
-          <Chip
-            label="No especificada"
-            size="small"
-            color="default"
-            variant="outlined"
-          />
-        );
-      }
-
-      return usosArray.map((u, index) => (
-        <Chip
-          key={index}
-          label={u}
-          size="small"
-          color="primary"
-          variant="outlined"
-          sx={{ ml: index === 0 ? 0 : 1 }}
-        />
-      ));
-    } catch (error) {
-      console.error("Error al procesar usos:", error);
-      return (
-        <Chip
-          label="Formato inválido"
-          size="small"
-          color="error"
-          variant="outlined"
-        />
-      );
-    }
-  };
   return (
     <>
       <PromoBadge
@@ -202,14 +125,14 @@ const ProductCard = ({ producto, isPromocion = false }) => {
               transform: "scale(1.03)",
               boxShadow: theme.shadows[6],
             },
-            maxHeight: 450,
-            minHeight: 450,
+            maxHeight: 'auto',
+            minHeight: 'none',
           }}
         >
           {/* Imagen del producto */}
           <Box
             sx={{
-              height: 160,
+              height: 180,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -238,7 +161,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
               flexGrow: 1,
               display: "flex",
               flexDirection: "column",
-              minHeight: 150,
+              minHeight: 120,
               overflow: "hidden",
             }}
           >
@@ -253,30 +176,11 @@ const ProductCard = ({ producto, isPromocion = false }) => {
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
+                mb: 1,
               }}
             >
               {producto.nombre}
             </Typography>
-
-            {/* Descripción acortada
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                mb: 2,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: "vertical",
-                flexGrow: 1,
-                // Compatibilidad con Firefox:
-                maxHeight: "4.5em", // 3 líneas (1.5em por línea)
-                lineHeight: "1.5em",
-              }}
-            >
-              {shortenDescription(producto.descripcion)}
-            </Typography> */}
 
             {/* Precios */}
             <Box
@@ -293,9 +197,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
                 sx={{ display: "flex", flexDirection: "column", width: "100%" }}
               >
                 {isPromocion && (
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="caption" color="text.disabled">
                       Precio regular:
                     </Typography>
@@ -328,9 +230,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
                 </Box>
 
                 {isPromocion && (
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="caption" color="text.secondary">
                       Descuento:
                     </Typography>
@@ -365,7 +265,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
             <Button
               variant="contained"
               fullWidth
-              color={isPromocion ? "secondary" : "primary"}
+              color={isPromocion ? "primary" : "secondary"}
               size="small"
               onClick={handleWhatsAppRedirect}
               sx={{ mb: 1 }}
@@ -386,99 +286,17 @@ const ProductCard = ({ producto, isPromocion = false }) => {
       </PromoBadge>
 
       {/* Modal de detalles */}
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            {producto.nombre}
-            <IconButton onClick={handleClose}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Box
-            display="flex"
-            flexDirection={{ xs: "column", md: "row" }}
-            gap={4}
-          >
-            <Box flex={1}>
-              <CardMedia
-                component="img"
-                image={producto.imagen}
-                alt={producto.nombre}
-                sx={{
-                  width: "100%",
-                  maxHeight: 400,
-                  objectFit: "contain",
-                  borderRadius: 1,
-                }}
-              />
-            </Box>
-            <Box flex={1}>
-              <Typography variant="h6" gutterBottom>
-                Descripción Completa
-              </Typography>
-              <Typography paragraph>
-                {producto.descripcion || "No hay descripción disponible"}
-              </Typography>
-
-              <Box mt={4}>
-                <Typography variant="h6" gutterBottom>
-                  Detalles del Producto
-                </Typography>
-                <Typography
-                  component="div"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: 1,
-                  }}
-                >
-                  <strong>Uso:</strong>
-                  {renderUsos(producto.uso)}
-                </Typography>
-                <Typography>
-                  <strong>Línea:</strong> {producto.linea || "No especificada"}
-                </Typography>
-                <Typography>
-                  <strong>Precio:</strong> {formatCOP(precioBase)}
-                </Typography>
-                {isPromocion && (
-                  <>
-                    <Typography>
-                      <strong>Descuento:</strong> {descuento}%
-                    </Typography>
-                    <Typography>
-                      <strong>Precio final:</strong> {formatCOP(precioFinal)}
-                    </Typography>
-                    <Typography>
-                      <strong>Ahorras:</strong> {formatCOP(ahorro)}
-                    </Typography>
-                  </>
-                )}
-                <Typography mt={2}>
-                  <strong>Stock disponible:</strong> {producto.stock} unidades
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            color={isPromocion ? "secondary" : "primary"}
-            onClick={handleWhatsAppRedirect}
-            disabled={producto.stock === 0}
-          >
-            {producto.stock === 0 ? "Agotado" : "Comprar por WhatsApp"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ModalDetailProduct
+        open={open}
+        onClose={handleClose}
+        product={producto}
+        isPromocion={isPromocion}
+        precioBase={precioBase}
+        precioFinal={precioFinal}
+        descuento={descuento}
+        ahorro={ahorro}
+        onWhatsAppClick={handleWhatsAppRedirect}
+      />
     </>
   );
 };
