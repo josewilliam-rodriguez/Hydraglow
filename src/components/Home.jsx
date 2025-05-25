@@ -17,6 +17,7 @@ const Home = () => {
         <SliderPromociones />
       </div>
       <br />
+      <br />
       <CompanyValues />
       <br />
       <Footer />
