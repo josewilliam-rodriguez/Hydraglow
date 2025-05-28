@@ -28,6 +28,7 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
     padding: theme.spacing(0, 1),
     boxSizing: "border-box",
     height: '100%', // Altura completa del contenedor
+    transition: "transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1)",
     
     "& > div": {
       height: "100%",
@@ -92,7 +93,7 @@ const SliderPromociones = () => {
   const settings = {
     dots: true,
     infinite: productosPromocion.length > 1,
-    speed: 500,
+    speed: 800,  // Aumenta a 0.8 segundos
     slidesToShow: isMobile ? 1 : isTablet ? 2 : 3,
     slidesToScroll: isMobile ? 1 : isTablet ? 2 : 3,
     autoplay: !isMobile,
@@ -101,6 +102,7 @@ const SliderPromociones = () => {
     centerMode: false,
     focusOnSelect: false,
     swipe: true,
+    fade: false,
     swipeToSlide: true,
     draggable: true,
     touchThreshold: 15,
@@ -161,7 +163,7 @@ const SliderPromociones = () => {
         position: "relative",
         maxWidth: '100vw', // Limita el ancho máximo
         
-        overflow: 'hidden', // Oculta cualquier desbordamiento
+        overflow: 'visible', // Oculta cualquier desbordamiento
       }}
     >
       <Typography
