@@ -98,7 +98,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
       <Box
         ref={modalContentRef}
         sx={{
-          width: { xs: '95%', md: '800px' },
+          width: { xs: "95%", md: "800px" },
           maxWidth: "1000px",
           maxHeight: "90vh",
           bgcolor: "background.paper",
@@ -110,7 +110,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
           overscrollBehavior: "contain",
           WebkitOverflowScrolling: "touch",
           margin: "auto", // ✅ Asegura centrado horizontal
-    alignItems: "center", // ✅ Estira los hijos verticalmente
+          alignItems: "center", // ✅ Estira los hijos verticalmente
         }}
       >
         <IconButton
@@ -132,8 +132,8 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
         {/* Sección de imagen */}
         <Box
           sx={{
-            width: { xs: "100%", md: "400" },
-            height: {  md: "400px" },
+            width: { xs: "100%", md: "50%" },
+            height: { md: "400px" },
             minHeight: "250px",
             position: "relative",
             bgcolor: theme.palette.grey[100],
@@ -141,7 +141,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
             justifyContent: "center",
             alignItems: "center",
             p: 3,
-            borderRadius: "16px 0 0 16px",
+            borderRadius: { xs: "16px 16px 0 0", md: "16px 0 0 16px" },
             aspectRatio: "1/1",
           }}
         >
@@ -150,8 +150,8 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
             image={product.imagen}
             alt={product.nombre}
             sx={{
-              width: '100%', // Ocupa todo el espacio disponible
-      height: '100%',
+              width: "100%", // Ocupa todo el espacio disponible
+              height: "100%",
               maxHeight: "100%", // Reduce un poco el tamaño para dar aire
               maxWidth: "100%",
               objectFit: "contain",
@@ -184,7 +184,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
         <Box
           sx={{
             flex: 1,
-            width: { xs: "100%", md: "55%" },
+            width: { xs: "100%", md: "50%" },
             p: { xs: 3, md: 4 },
             overflowY: "auto",
             maxHeight: { md: "90vh" },
