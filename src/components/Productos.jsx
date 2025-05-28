@@ -434,7 +434,7 @@ const Productos = () => {
                             color="text.secondary"
                             ml={1}
                           >
-                            ({product.stock} Disponible)
+                            ({product.stock} Disponibles)
                           </Typography>
                         </Box>
                         <Chip
