@@ -72,12 +72,16 @@ const SobreNosotros = () => {
         </Typography>
         <Typography
           variant="body1"
-          sx={{
-            fontSize: "1rem",
-            textAlign: "justify",
-            color: "black",
-            lineHeight: 1.6,
-          }}
+           sx={{
+    fontSize: "1rem",
+    textAlign: "justify",
+    color: theme => theme.palette.common.black, // Negro garantizado
+    lineHeight: 1.6,
+    '& b': { // Estilo para las negritas
+      color: theme => theme.palette.common.black,
+      fontWeight: 'bold'
+    }
+  }}
         >
           Nuestros jabones artesanales <b>Hydraglow</b> están diseñados para
           nutrir y proteger tu piel, proporcionándote una sensación de{" "}
