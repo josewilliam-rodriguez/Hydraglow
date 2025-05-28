@@ -39,8 +39,8 @@ const PromoBadge = styled(Badge)(({ theme }) => ({
 const ProductCard = styled(Card)(({ theme, ispromo }) => ({
   display: "flex",
   flexDirection: "column",
-  height: "100%", // Asegura que todas las cards tengan la misma altura
-  minHeight: "400px", // Altura mínima consistente
+  height: "100%",
+  minHeight: { xs: "350px", sm: "400px", md: "420px" }, // Altura responsive
   transition: "transform 0.2s, box-shadow 0.2s",
   "&:hover": {
     transform: "translateY(-4px)",
@@ -48,7 +48,9 @@ const ProductCard = styled(Card)(({ theme, ispromo }) => ({
   },
   border: ispromo === "true" ? `2px solid ${theme.palette.error.main}` : "none",
   width: "100%",
+  maxWidth: { xs: "100%", sm: "345px", md: "350px" }, // Ancho controlado en PC
   borderRadius: theme.shape.borderRadius,
+  margin: "0 auto", // Centrado en contenedores grandes
 }));
 
 const Productos = () => {
@@ -231,27 +233,38 @@ const Productos = () => {
               : product.precio;
 
             return (
-              <Grid key={product.id} size={{ xs: 14, sm: 8, md: 4, lg: 3 }}>
+              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                 {isPromo ? (
                   <PromoBadge badgeContent="OFERTA" overlap="rectangular">
                     <ProductCard ispromo="true">
                       <CardMedia
                         component="img"
                         sx={{
-                          width: "100%", // Ocupa todo el ancho disponible
-                          height: { xs: 140, sm: 160, md: 180 }, // Altura responsive
-                          maxHeight: "180px", // Límite máximo
-                          objectFit: "contain",
+                          width: "90%", // Ocupa todo el ancho disponible
+                          height: { xs: 180, sm: 160, md: 180 }, // Altura responsive
+                          maxHeight: "190px", // Límite máximo
+                          objectFit: "cover",
                           p: 1, // Padding reducido
                           backgroundColor: theme.palette.grey[50],
                           display: "flex", // Para centrado adicional
                           margin: "0 auto", // Centrado horizontal
+                          alignItems: "center",
                         }}
                         image={product.imagen || "/placeholder-product.png"}
                         alt={product.nombre}
                         onClick={() => handleOpenModal(product)}
                       />
-                      <CardContent sx={{ flexGrow: 1 }}>
+                      <CardContent
+                        sx={{
+                          flexGrow: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          pt: 1,
+                          pb: 2,
+                          px: 2,
+                          height: "100%", // Asegura que el contenido ocupe todo el espacio disponible
+                        }}
+                      >
                         <Typography
                           gutterBottom
                           variant="h6"
@@ -326,7 +339,7 @@ const Productos = () => {
                               ({product.stock} disponibles)
                             </Typography>
                           </Box>
-
+                          <Box sx={{ p: 2 }}>
                           <Button
                             fullWidth
                             variant="contained"
@@ -338,6 +351,17 @@ const Productos = () => {
                           >
                             {product.stock > 0 ? "Comprar ahora" : "Agotado"}
                           </Button>
+                          <Button
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            onClick={() => handleOpenModal(product)}
+                            color="secondary"
+                            sx={{ mt: 1.5 }}
+                          >
+                            Ver Detalles
+                          </Button>
+                          </Box>
                         </Box>
                       </CardContent>
                     </ProductCard>
@@ -388,7 +412,7 @@ const Productos = () => {
                         {product.nombre}
                       </Typography>
 
-                      <Box sx={{ mt: "auto",  }}>
+                      <Box sx={{ mt: "auto" }}>
                         <Typography
                           variant="body1"
                           color="primary.main"
@@ -398,7 +422,7 @@ const Productos = () => {
                           {formatPrice(product.precio)}
                         </Typography>
 
-                        <Box display="flex" justifyContent="space-between" >
+                        <Box display="flex" justifyContent="space-between">
                           <Typography
                             variant="caption"
                             color={product.stock > 0 ? "success.main" : "error"}
@@ -410,7 +434,7 @@ const Productos = () => {
                             color="text.secondary"
                             ml={1}
                           >
-                            ({product.stock}  UD)
+                            ({product.stock} UD)
                           </Typography>
                         </Box>
                         <Chip
@@ -419,28 +443,27 @@ const Productos = () => {
                           size="small"
                         />
                         <Box sx={{ p: 2 }}>
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          sx={{ mt: 2, mb: 2 }}
-                          onClick={() => handleWhatsAppRedirect(product)}
-                          disabled={product.stock === 0}
-                        >
-                          {product.stock > 0 ? "Consultar" : "Agotado"}
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          size="small"
-                          onClick={() => handleOpenModal(product)}
-                          color="secondary"
-                        >
-                          Ver Detalles
-                        </Button>
-                        
-                      </Box>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            sx={{ mt: 2, mb: 2 }}
+                            onClick={() => handleWhatsAppRedirect(product)}
+                            disabled={product.stock === 0}
+                          >
+                            {product.stock > 0 ? "Consultar" : "Agotado"}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            onClick={() => handleOpenModal(product)}
+                            color="secondary"
+                          >
+                            Ver Detalles
+                          </Button>
+                        </Box>
                       </Box>
                     </CardContent>
                   </ProductCard>

@@ -228,7 +228,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
               {product.promocion === "si" ? (
                 <>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="h4" color="primary" fontWeight="bold">
+                    <Typography variant="h4" color="black" fontWeight="bold">
                       ${Math.round(discountedPrice).toLocaleString()}
                     </Typography>
                     <Chip
