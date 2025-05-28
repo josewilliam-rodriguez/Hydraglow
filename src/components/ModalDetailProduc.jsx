@@ -198,7 +198,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
                 component="h1"
                 fontWeight="bold"
                 gutterBottom
-                color="secondary"
+                color="black"
               >
                 {product.nombre}
               </Typography>
@@ -249,7 +249,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
                   </Typography>
                 </>
               ) : (
-                <Typography variant="h4" color="primary" fontWeight="bold">
+                <Typography variant="h4" color="black" fontWeight="bold">
                   ${product.precio.toLocaleString()}
                 </Typography>
               )}
@@ -257,18 +257,18 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
 
             <Stack direction="row" spacing={2} alignItems="center">
               <InventoryIcon color={product.stock > 0 ? "success" : "error"} />
-              <Typography color="secondary">
+              <Typography color="secondary" fontWeight="bold">
                 {product.stock > 0 ? "En stock" : "Agotado"}
                 {product.stock > 0 && (
                   <Typography component="span" color="text.secondary" ml={1}>
-                    ({product.stock} unidades disponibles)
+                    ({product.stock} UD)
                   </Typography>
                 )}
               </Typography>
             </Stack>
 
             <Box>
-              <Typography variant="h6" gutterBottom color="secondary">
+              <Typography variant="h6" gutterBottom color="black" fontWeight="bold">
                 Descripción
               </Typography>
               <Typography color="text.secondary" whiteSpace="pre-line">
@@ -278,7 +278,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
 
             {usos.length > 0 && (
               <Box>
-                <Typography variant="h6" gutterBottom color="secondary">
+                <Typography variant="h6" gutterBottom color="black" fontWeight="bold">
                   Uso recomendado
                 </Typography>
                 <Box
@@ -296,13 +296,16 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
                     <Chip
                       key={index}
                       label={uso}
-                      color="info"
                       size="small"
                       variant="outlined"
                       sx={{
-                        borderColor: "info.main",
-                        color: "info.dark",
-                        backgroundColor: "info.light",
+                        borderColor: "#4caf50", // Verde
+                        color: "#2e7d32", // Verde oscuro
+                        backgroundColor: "#e8f5e9", // Verde muy claro
+                        margin: "0 8px 8px 0", // Espaciado
+                        "&:hover": {
+                          backgroundColor: "#c8e6c9", // Verde claro al hover
+                        },
                       }}
                     />
                   ))}

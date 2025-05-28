@@ -13,7 +13,8 @@ const theme = createTheme({
     secondary: { main: "#ff5722" },
     terciary: { main: "#ffffff"},
     background: { default: "#f5f5f5", paper: "#ffffff" },
-    success: { main: "#4caf50", dark: "#388e3c" }
+    success: { main: "#4caf50", dark: "#388e3c" },
+    black: { main: "#000000"}
   },
 });
 
