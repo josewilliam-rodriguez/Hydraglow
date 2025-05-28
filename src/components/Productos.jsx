@@ -336,7 +336,7 @@ const Productos = () => {
                               color="text.secondary"
                               ml={1}
                             >
-                              ({product.stock} Disponibles)
+                              ({product.stock} Unidades)
                             </Typography>
                           </Box>
                           <Box sx={{ p: 2 }}>
@@ -434,7 +434,7 @@ const Productos = () => {
                             color="text.secondary"
                             ml={1}
                           >
-                            ({product.stock} Disponibles)
+                            ({product.stock} Unidades)
                           </Typography>
                         </Box>
                         <Chip
