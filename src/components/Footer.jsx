@@ -76,7 +76,7 @@ const Footer = () => {
               Productos
             </Typography>
             <Link
-              href="#"
+              href="/Productos"
               color="#FFFFFF"
               underline="hover"
               display="block"
@@ -117,7 +117,7 @@ const Footer = () => {
               Enlaces
             </Typography>
             <Link
-              href="#"
+              href="/Nosotros"
               color="#FFFFFF"
               underline="hover"
               display="block"

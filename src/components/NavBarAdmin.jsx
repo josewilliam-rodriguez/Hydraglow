@@ -77,10 +77,10 @@ const NavBarAdmin = () => {
             },
           }}
         >
-          <ListItemText primary="Productos" />
+          <ListItemText primary="Panel Admin" />
         </ListItem>
         
-        <ListItem
+        {/* <ListItem
           onClick={() => {
             navigate("/admin/usuarios");
             setMobileOpen(false);
@@ -93,9 +93,9 @@ const NavBarAdmin = () => {
           }}
         >
           <ListItemText primary="Usuarios" />
-        </ListItem>
+        </ListItem> */}
         
-        <ListItem
+        {/* <ListItem
           onClick={handleOpenProductModal}
           sx={{
             "&:hover": {
@@ -105,7 +105,7 @@ const NavBarAdmin = () => {
           }}
         >
           <ListItemText primary="Agregar Producto" />
-        </ListItem>
+        </ListItem> */}
       </List>
 
       <Divider />
@@ -181,7 +181,7 @@ const NavBarAdmin = () => {
                   }
                 }}
               >
-                Productos
+                Panel ADMIN
               </Button>
               
             {isMobile && (  <Button
@@ -202,7 +202,7 @@ const NavBarAdmin = () => {
           )}
 
           {/* Botón agregar producto - solo icono en móvil */}
-          {isMobile && (
+          {/* {isMobile && (
             <IconButton
               color="inherit"
               onClick={handleOpenProductModal}
@@ -211,7 +211,7 @@ const NavBarAdmin = () => {
             >
               <AddIcon />
             </IconButton>
-          )}
+          )} */}
 
           {/* Menú de usuario */}
           <Box>

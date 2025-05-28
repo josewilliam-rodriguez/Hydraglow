@@ -15,8 +15,8 @@ const SliderHome = () => {
         },
         {
           image: "https://nanova.org/wp-content/uploads/2024/02/lh95b720.bmp.jpg",
-          title: "Gatos felices, dueños tranquilos",
-          description: "Alimento especial para gatos exigentes.",
+          title: "Perros felices, dueños tranquilos",
+          description: "Productos especial para perros exigentes.",
           link: "/Productos"
         },
         {

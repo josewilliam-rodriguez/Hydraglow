@@ -36,17 +36,19 @@ const PromoBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-// Componente de Card unificado
 const ProductCard = styled(Card)(({ theme, ispromo }) => ({
-  height: "100%",
   display: "flex",
   flexDirection: "column",
+  height: "100%", // Asegura que todas las cards tengan la misma altura
+  minHeight: "400px", // Altura mínima consistente
   transition: "transform 0.2s, box-shadow 0.2s",
   "&:hover": {
     transform: "translateY(-4px)",
     boxShadow: theme.shadows[4],
   },
   border: ispromo === "true" ? `2px solid ${theme.palette.error.main}` : "none",
+  width: "100%",
+  borderRadius: theme.shape.borderRadius,
 }));
 
 const Productos = () => {
@@ -100,54 +102,56 @@ const Productos = () => {
 
   // Redirección a WhatsApp
   const handleWhatsAppRedirect = (product) => {
-  if (!product.contacto) {
-    alert("Este producto no tiene contacto asignado");
-    return;
-  }
+    if (!product.contacto) {
+      alert("Este producto no tiene contacto asignado");
+      return;
+    }
 
-  const formattedPhone = formatPhoneNumber(product.contacto);
-  if (!formattedPhone) {
-    alert("Número inválido. Debe ser un número colombiano de 10 dígitos");
-    return;
-  }
+    const formattedPhone = formatPhoneNumber(product.contacto);
+    if (!formattedPhone) {
+      alert("Número inválido. Debe ser un número colombiano de 10 dígitos");
+      return;
+    }
 
-  const isPromo = product.promocion === "si";
-  const discountedPrice = isPromo
-    ? calculateDiscountedPrice(product.precio, product.porcentajeDescuento)
-    : product.precio;
+    const isPromo = product.promocion === "si";
+    const discountedPrice = isPromo
+      ? calculateDiscountedPrice(product.precio, product.porcentajeDescuento)
+      : product.precio;
 
-  let message = `¡Hola! Estoy interesado en comprar el producto:\n\n*${product.nombre}*`;
-  
-  // Agregar categoría y línea si existen
-  if (product.categoria || product.linea) {
-    message += `\n\n• Categoría: ${product.categoria || "No especificada"}`;
-    message += `\n• Línea: ${product.linea || "No especificada"}`;
-  }
+    let message = `¡Hola! Estoy interesado en comprar el producto:\n\n*${product.nombre}*`;
 
-  // Mensaje para productos en promoción
-  if (isPromo) {
-    message += `\n\n• Precio regular: ${formatPrice(product.precio)}`;
-    message += `\n\n📢 *¡OFERTA ESPECIAL!* 📢`;
-    message += `\n  - Descuento: ${product.porcentajeDescuento}%`;
-    message += `\n  - Precio final: ${formatPrice(discountedPrice)}`;
-    message += `\n  - Ahorras: ${formatPrice(product.precio - discountedPrice)}`;
-  } else {
-    // Mensaje para productos sin promoción
-    message += `\n\n• Precio: ${formatPrice(product.precio)}`;
-  }
+    // Agregar categoría y línea si existen
+    if (product.categoria || product.linea) {
+      message += `\n\n• Categoría: ${product.categoria || "No especificada"}`;
+      message += `\n• Línea: ${product.linea || "No especificada"}`;
+    }
 
-  // Agregar descripción si existe
-  if (product.descripcion) {
-    message += `\n\nDescripción:\n${product.descripcion}`;
-  }
+    // Mensaje para productos en promoción
+    if (isPromo) {
+      message += `\n\n• Precio regular: ${formatPrice(product.precio)}`;
+      message += `\n\n📢 *¡OFERTA ESPECIAL!* 📢`;
+      message += `\n  - Descuento: ${product.porcentajeDescuento}%`;
+      message += `\n  - Precio final: ${formatPrice(discountedPrice)}`;
+      message += `\n  - Ahorras: ${formatPrice(
+        product.precio - discountedPrice
+      )}`;
+    } else {
+      // Mensaje para productos sin promoción
+      message += `\n\n• Precio: ${formatPrice(product.precio)}`;
+    }
 
-  message += "\n\nPor favor, indíqueme cómo proceder con la compra.";
+    // Agregar descripción si existe
+    if (product.descripcion) {
+      message += `\n\nDescripción:\n${product.descripcion}`;
+    }
 
-  window.open(
-    `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`,
-    "_blank"
-  );
-};
+    message += "\n\nPor favor, indíqueme cómo proceder con la compra.";
+
+    window.open(
+      `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
+  };
 
   // Carga inicial de productos
   useEffect(() => {
@@ -174,7 +178,13 @@ const Productos = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container
+      maxWidth="xl"
+      sx={{
+        py: 4,
+        px: 2, // Padding horizontal constante para todos los dispositivos
+      }}
+    >
       <ModalDetailProduct
         open={openModal}
         onClose={handleCloseModal}
@@ -189,7 +199,7 @@ const Productos = () => {
         align="center"
         sx={{ fontWeight: 600, mb: 3, color: "text.primary" }}
       >
-        Catálogo de Productos
+        Catálogo De Productos
       </Typography>
 
       <Divider sx={{ mb: 4 }} />
@@ -201,7 +211,16 @@ const Productos = () => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            alignItems: "stretch", // Fuerza igual altura en todas las cards
+            [theme.breakpoints.down("sm")]: {
+              px: 2, // Espaciado lateral en móviles
+            },
+          }}
+        >
           {sortedProducts.map((product) => {
             const isPromo = product.promocion === "si";
             const discountedPrice = isPromo
@@ -212,17 +231,21 @@ const Productos = () => {
               : product.precio;
 
             return (
-              <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+              <Grid key={product.id} size={{ xs: 14, sm: 8, md: 4, lg: 3 }}>
                 {isPromo ? (
                   <PromoBadge badgeContent="OFERTA" overlap="rectangular">
                     <ProductCard ispromo="true">
                       <CardMedia
                         component="img"
                         sx={{
-                          height: 160,
+                          width: "100%", // Ocupa todo el ancho disponible
+                          height: { xs: 140, sm: 160, md: 180 }, // Altura responsive
+                          maxHeight: "180px", // Límite máximo
                           objectFit: "contain",
-                          p: 2,
+                          p: 1, // Padding reducido
                           backgroundColor: theme.palette.grey[50],
+                          display: "flex", // Para centrado adicional
+                          margin: "0 auto", // Centrado horizontal
                         }}
                         image={product.imagen || "/placeholder-product.png"}
                         alt={product.nombre}
@@ -265,15 +288,23 @@ const Productos = () => {
                               size="small"
                             />
                           </Box>
-
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ textDecoration: "line-through" }}
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            mt={1}
                           >
-                            {formatPrice(product.precio)}
-                          </Typography>
-
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ textDecoration: "line-through" }}
+                            >
+                              {formatPrice(product.precio)}
+                            </Typography>
+                            <Typography variant="caption" color="success.main">
+                              Ahorras{" "}
+                              {formatPrice(product.precio - discountedPrice)}
+                            </Typography>
+                          </Box>
                           <Box
                             display="flex"
                             justifyContent="space-between"
@@ -287,9 +318,12 @@ const Productos = () => {
                             >
                               {product.stock > 0 ? `Disponible` : "Agotado"}
                             </Typography>
-                            <Typography variant="caption" color="success.main">
-                              Ahorras{" "}
-                              {formatPrice(product.precio - discountedPrice)}
+                            <Typography
+                              component="span"
+                              color="text.secondary"
+                              ml={1}
+                            >
+                              ({product.stock} disponibles)
                             </Typography>
                           </Box>
 
@@ -313,16 +347,31 @@ const Productos = () => {
                     <CardMedia
                       component="img"
                       sx={{
-                        height: 160,
-                        objectFit: "contain",
-                        p: 2,
+                        width: "90%", // Ocupa todo el ancho disponible
+                        height: { xs: 180, sm: 160, md: 180 }, // Altura responsive
+                        maxHeight: "190px", // Límite máximo
+                        objectFit: "cover",
+                        p: 1, // Padding reducido
                         backgroundColor: theme.palette.grey[50],
+                        display: "flex", // Para centrado adicional
+                        margin: "0 auto", // Centrado horizontal
+                        alignItems: "center",
                       }}
                       image={product.imagen || "/placeholder-product.png"}
                       alt={product.nombre}
                       onClick={() => handleOpenModal(product)}
                     />
-                    <CardContent sx={{ flexGrow: 1 }}>
+                    <CardContent
+                      sx={{
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        pt: 1,
+                        pb: 2,
+                        px: 2,
+                        height: "100%", // Asegura que el contenido ocupe todo el espacio disponible
+                      }}
+                    >
                       <Typography
                         gutterBottom
                         variant="h6"
@@ -339,7 +388,7 @@ const Productos = () => {
                         {product.nombre}
                       </Typography>
 
-                      <Box sx={{ mt: "auto" }}>
+                      <Box sx={{ mt: "auto",  }}>
                         <Typography
                           variant="body1"
                           color="primary.main"
@@ -349,31 +398,49 @@ const Productos = () => {
                           {formatPrice(product.precio)}
                         </Typography>
 
-                        <Box display="flex" justifyContent="space-between">
+                        <Box display="flex" justifyContent="space-between" >
                           <Typography
                             variant="caption"
                             color={product.stock > 0 ? "success.main" : "error"}
                           >
                             {product.stock > 0 ? `Disponible` : "Agotado"}
                           </Typography>
-                          <Chip
-                            label={product.linea || "General"}
-                            color="secondary"
-                            size="small"
-                          />
+                          <Typography
+                            component="span"
+                            color="text.secondary"
+                            ml={1}
+                          >
+                            ({product.stock}  UD)
+                          </Typography>
                         </Box>
-
+                        <Chip
+                          label={product.linea || "General"}
+                          color="secondary"
+                          size="small"
+                        />
+                        <Box sx={{ p: 2 }}>
                         <Button
                           fullWidth
                           variant="outlined"
                           color="primary"
                           size="small"
-                          sx={{ mt: 2 }}
+                          sx={{ mt: 2, mb: 2 }}
                           onClick={() => handleWhatsAppRedirect(product)}
                           disabled={product.stock === 0}
                         >
                           {product.stock > 0 ? "Consultar" : "Agotado"}
                         </Button>
+                        <Button
+                          variant="outlined"
+                          fullWidth
+                          size="small"
+                          onClick={() => handleOpenModal(product)}
+                          color="secondary"
+                        >
+                          Ver Detalles
+                        </Button>
+                        
+                      </Box>
                       </Box>
                     </CardContent>
                   </ProductCard>

@@ -7,6 +7,7 @@ const Productos = lazy(() => import('../components/Productos'))
 const Registro = lazy(() => import('../components/Registro'))
 const ModalDetailProduc = lazy(() => import('../components/ModalDetailProduc'))
 const SliderHome = lazy (() => import('../components/SliderHome'))
+const SobreNosotros = lazy (() => import('../components/SobreNosotros'))
 const Available = () => {
   const { loggedInUser } = useSelector(state => state.currentUser);
   return (
@@ -16,6 +17,7 @@ const Available = () => {
     <Route path="/Registro" element={!loggedInUser ? <Registro /> : <Navigate to="/" />} />
     <Route path="/DetalleProductos/:id" element={<ModalDetailProduc />} />
     <Route path='/Promociones' element={<SliderHome/>}/>
+    <Route path='/Nosotros' element={<SobreNosotros/>} />
 
   </Routes>
 

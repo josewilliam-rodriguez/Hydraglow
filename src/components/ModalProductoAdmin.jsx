@@ -28,7 +28,7 @@ const lineaOptions = [
   "otros",
 ];
 const promocionOptions = ["no", "si"];
-const usoOptions = ["manos", "cara", "piel", "cuerpo"];
+const usoOptions = ["Manos", "Facial", "Piel", "Cuerpo"];
 
 const formatCOP = (value) => {
   if (!value) return "$0";
@@ -73,8 +73,9 @@ const validationSchema = Yup.object().shape({
     .integer("Debe ser un número entero")
     .min(0, "El stock no puede ser negativo")
     .typeError("Debe ser un número válido"),
-  linea: Yup.string().oneOf(lineaOptions),
-  promocion: Yup.string()
+linea: Yup.string()
+  .oneOf([...lineaOptions, ''], "Selecciona una línea válida")
+  .notRequired(),  promocion: Yup.string()
     .oneOf(promocionOptions)
     .required("Este campo es requerido"),
   porcentajeDescuento: Yup.number().test(
@@ -109,7 +110,7 @@ const ModalProductoAdmin = ({
       descripcion: productToEdit?.descripcion || "",
       imagen: productToEdit?.imagen || "",
       stock: productToEdit?.stock?.toString() || "",
-      linea: productToEdit?.linea || "cremas hidratantes",
+      linea: productToEdit?.linea || "Jabón artesanal canino",
       promocion: productToEdit?.promocion || "no",
       porcentajeDescuento: productToEdit?.porcentajeDescuento || 0,
       uso: productToEdit?.uso || [],
