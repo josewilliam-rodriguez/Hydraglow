@@ -59,22 +59,22 @@ const ValueItem = ({ icon, title, description }) => {
 const CompanyValues = () => {
   const values = [
     {
-      icon: <CrueltyFree />,
+      icon: <CrueltyFree color="terciary" />,
       title: "Sin Crueldad Animal",
       description: "Nuestros productos están diseñados sin pruebas en animales.",
     },
     {
-      icon: <Spa />,
+      icon: <Spa color="terciary"/>,
       title: "Ingredientes Naturales",
       description: "Usamos los mejores ingredientes 100% naturales.",
     },
     {
-      icon: <Recycling />,
-      title: "Packaging Reciclable",
+      icon: <Recycling color="terciary" />,
+      title: "Embalaje Reciclable",
       description: "Nuestros empaques son reciclables y amigables con el medio ambiente.",
     },
     {
-      icon: <Science />,
+      icon: <Science color="terciary"/>,
       title: "Libre de Tóxicos",
       description: "Sin sulfatos, parabenos ni siliconas. Solo lo mejor para ti.",
     },
