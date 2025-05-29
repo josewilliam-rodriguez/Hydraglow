@@ -9,8 +9,16 @@ import {
   Chip,
   Badge,
   useTheme,
+  Stack,
+  Divider,
+  Rating,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from "@mui/icons-material/Share";
 import ModalDetailProduct from "./ModalDetailProduc";
 
 // Función para formatear como COP
@@ -34,18 +42,38 @@ const PromoBadge = styled(Badge)(({ theme }) => ({
     right: 10,
     top: 10,
     padding: "0 4px",
-    backgroundColor: theme.palette.secondary.main,
-    color: theme.palette.secondary.contrastText,
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
     fontWeight: "bold",
+    fontSize: "0.7rem",
+    borderRadius: 4,
+  },
+}));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  transition: "transform 0.3s, box-shadow 0.3s",
+  borderRadius: 12,
+  overflow: "hidden",
+  minHeight: "450px",
+  boxShadow: theme.shadows[2],
+  "&:hover": {
+    transform: "translateY(-5px)",
+    boxShadow: theme.shadows[6],
   },
 }));
 
 const ProductCard = ({ producto, isPromocion = false }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+   const [isHovered, setIsHovered] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const toggleFavorite = () => setIsFavorite(!isFavorite);
 
   // Asegurarse de que tenemos valores numéricos correctos
   const precioBase =
@@ -112,27 +140,17 @@ const ProductCard = ({ producto, isPromocion = false }) => {
   return (
     <>
       <PromoBadge
-        badgeContent={isPromocion ? "PROMO" : null}
+        badgeContent={isPromocion ? `-${descuento}%` : null}
         invisible={!isPromocion}
       >
-        <Card
-          sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            transition: "transform 0.3s",
-            "&:hover": {
-              transform: "scale(1.03)",
-              boxShadow: theme.shadows[6],
-            },
-            maxHeight: 'auto',
-            minHeight: 'none',
-          }}
-        >
-          {/* Imagen del producto */}
+        <StyledCard
+        onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
+          {/* Imagen del producto con overlay de acciones */}
           <Box
             sx={{
-              height: 180,
+              position: "relative",
+              height: 200,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -140,14 +158,61 @@ const ProductCard = ({ producto, isPromocion = false }) => {
               p: 2,
             }}
           >
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                zIndex: 1,
+                display: "flex",
+                gap: 0.5,
+              }}
+            >
+              <Tooltip title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}>
+                <IconButton
+                  size="small"
+                  onClick={toggleFavorite}
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.8)",
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.9)",
+                    },
+                  }}
+                >
+                  {isFavorite ? (
+                    <FavoriteIcon color="error" fontSize="small" />
+                  ) : (
+                    <FavoriteBorderIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Compartir">
+                <IconButton
+                  size="small"
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.8)",
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.9)",
+                    },
+                  }}
+                >
+                  <ShareIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
             <CardMedia
               component="img"
-              sx={{
-                objectFit: "contain",
-                maxHeight: "100%",
-                width: "auto",
-                maxWidth: "100%",
-              }}
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              transition: "transform 0.5s ease",
+                              transform: isHovered ? "scale(1.05)" : "scale(1)",
+                            }}
               image={producto.imagen}
               alt={producto.nombre}
               onError={(e) => {
@@ -161,128 +226,124 @@ const ProductCard = ({ producto, isPromocion = false }) => {
               flexGrow: 1,
               display: "flex",
               flexDirection: "column",
-              minHeight: 120,
-              overflow: "hidden",
+              p: 2,
             }}
           >
+            {/* Categoría y rating */}
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+              <Chip
+                label={producto.categoria || "General"}
+                size="small"
+                color="default"
+                variant="outlined"
+              />
+              {producto.rating && (
+                <Rating
+                  value={producto.rating}
+                  precision={0.5}
+                  size="small"
+                  readOnly
+                />
+              )}
+            </Stack>
+
             {/* Nombre del producto */}
             <Typography
               gutterBottom
-              variant="h6"
+              variant="subtitle1"
               component="h3"
               sx={{
+                fontWeight: 600,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 mb: 1,
+                minHeight: "3em",
               }}
             >
               {producto.nombre}
             </Typography>
 
             {/* Precios */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: "auto",
-                flexDirection: isPromocion ? "column" : "row",
-                alignItems: isPromocion ? "flex-start" : "center",
-                gap: isPromocion ? 0.5 : 0,
-              }}
-            >
-              <Box
-                sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-              >
-                {isPromocion && (
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="caption" color="text.disabled">
-                      Precio regular:
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        textDecoration: "line-through",
-                        color: theme.palette.text.disabled,
-                      }}
-                    >
-                      {formatCOP(precioBase)}
-                    </Typography>
-                  </Box>
-                )}
+            <Box mt="auto">
+              {isPromocion && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textDecoration: "line-through",
+                    color: theme.palette.text.disabled,
+                  }}
+                >
+                  {formatCOP(precioBase)}
+                </Typography>
+              )}
 
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    variant="body1"
-                    color={isPromocion ? "secondary" : "text.primary"}
-                  >
-                    {isPromocion ? "Precio final:" : "Precio:"}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color={isPromocion ? "secondary" : "primary"}
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    {formatCOP(precioFinal)}
-                  </Typography>
-                </Box>
-
+              <Stack direction="row" alignItems="flex-end" spacing={1}>
+                <Typography
+                  variant="h6"
+                  color={isPromocion ? "error" : "primary"}
+                  sx={{ fontWeight: 700 }}
+                >
+                  {formatCOP(precioFinal)}
+                </Typography>
+                
                 {isPromocion && (
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="caption" color="text.secondary">
-                      Descuento:
-                    </Typography>
-                    <Typography variant="caption" color="success.main">
-                      {descuento}% (Ahorras {formatCOP(ahorro)})
-                    </Typography>
-                  </Box>
+                  <Typography variant="caption" color="success.main">
+                    Ahorras {formatCOP(ahorro)}
+                  </Typography>
                 )}
-              </Box>
+              </Stack>
 
               {producto.stock <= 5 && producto.stock > 0 && (
-                <Chip
-                  label={`Últ. ${producto.stock}`}
-                  size="small"
-                  color="error"
-                  sx={{ ml: "auto", alignSelf: "flex-end" }}
-                />
-              )}
-              {producto.stock === 0 && (
-                <Chip
-                  label="Agotado"
-                  size="small"
-                  color="error"
-                  sx={{ ml: "auto", alignSelf: "flex-end" }}
-                />
+                <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                  ¡Solo quedan {producto.stock} unidades!
+                </Typography>
               )}
             </Box>
           </CardContent>
 
           {/* Botones */}
-          <Box sx={{ p: 2 }}>
-            <Button
-              variant="contained"
-              fullWidth
-              color={isPromocion ? "primary" : "secondary"}
-              size="small"
-              onClick={handleWhatsAppRedirect}
-              sx={{ mb: 1 }}
-              disabled={producto.stock === 0}
-            >
-              {producto.stock === 0 ? "Agotado" : "Comprar"}
-            </Button>
-            <Button
-              variant="outlined"
-              fullWidth
-              size="small"
-              onClick={handleOpen}
-            >
-              Ver Detalles
-            </Button>
+          <Box sx={{ p: 2, pt: 0 }}>
+            <Stack spacing={1}>
+              <Button
+                variant="contained"
+                fullWidth
+                color={isPromocion ? "error" : "primary"}
+                size="medium"
+                onClick={handleWhatsAppRedirect}
+                disabled={producto.stock === 0}
+                sx={{
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  fontSize: "0.8rem",
+                  letterSpacing: 0.5,
+                }}
+              >
+                {producto.stock === 0 ? "Agotado" : "Comprar ahora"}
+              </Button>
+              
+              <Divider sx={{ my: 1 }}>o</Divider>
+              
+              <Button
+                variant="outlined"
+                fullWidth
+                size="medium"
+                onClick={handleOpen}
+                sx={{
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: 500,
+                }}
+              >
+                Ver detalles
+              </Button>
+            </Stack>
           </Box>
-        </Card>
+        </StyledCard>
       </PromoBadge>
 
       {/* Modal de detalles */}

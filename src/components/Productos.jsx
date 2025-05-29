@@ -15,6 +15,11 @@ import {
   Button,
   useTheme,
   Badge,
+  IconButton,
+  Tooltip,
+  Avatar,
+  CardActionArea,
+  Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -23,35 +28,72 @@ import {
   selectProductsStatus,
 } from "../redux/slices/productosSlices";
 import ModalDetailProduct from "./ModalDetailProduc";
+import {
+  LocalOffer as OfferIcon,
+  WhatsApp as WhatsAppIcon,
+  Visibility as VisibilityIcon,
+  Star as StarIcon,
+  StarBorder as StarBorderIcon,
+} from "@mui/icons-material";
 
-// Componente de Badge para promociones
+// Componente de Badge para promociones mejorado
 const PromoBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    right: 10,
-    top: 10,
-    padding: "0 4px",
+    right: 16,
+    top: 16,
+    padding: theme.spacing(0.5),
     backgroundColor: theme.palette.error.main,
     color: theme.palette.common.white,
     fontWeight: "bold",
+    fontSize: theme.typography.pxToRem(12),
+    boxShadow: theme.shadows[2],
+    borderRadius: theme.shape.borderRadius,
   },
 }));
 
+// Tarjeta de producto estilizada
 const ProductCard = styled(Card)(({ theme, ispromo }) => ({
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  minHeight: { xs: "350px", sm: "400px", md: "420px" }, // Altura responsive
-  transition: "transform 0.2s, box-shadow 0.2s",
+  minHeight: "100%",
+  transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
   "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: theme.shadows[4],
+    transform: "translateY(-8px)",
+    boxShadow: theme.shadows[6],
   },
   border: ispromo === "true" ? `2px solid ${theme.palette.error.main}` : "none",
-  width: "100%",
-  maxWidth: { xs: "100%", sm: "345px", md: "350px" }, // Ancho controlado en PC
-  borderRadius: theme.shape.borderRadius,
-  margin: "0 auto", // Centrado en contenedores grandes
+  position: "relative",
+  overflow: "hidden",
+  borderRadius: theme.shape.borderRadius * 2,
+  backgroundColor: theme.palette.background.paper,
 }));
+
+// Componente de valoración con estrellas
+const RatingStars = ({ rating }) => {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+
+  for (let i = 1; i <= 5; i++) {
+    if (i <= fullStars) {
+      stars.push(<StarIcon key={i} color="warning" fontSize="small" />);
+    } else if (i === fullStars + 1 && hasHalfStar) {
+      stars.push(<StarIcon key={i} color="warning" fontSize="small" />);
+    } else {
+      stars.push(<StarBorderIcon key={i} color="disabled" fontSize="small" />);
+    }
+  }
+
+  return (
+    <Box display="flex" alignItems="center">
+      {stars}
+      <Typography variant="caption" color="text.secondary" ml={0.5}>
+        ({rating.toFixed(1)})
+      </Typography>
+    </Box>
+  );
+};
 
 const Productos = () => {
   const dispatch = useDispatch();
@@ -60,12 +102,13 @@ const Productos = () => {
   const theme = useTheme();
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [hoveredProduct, setHoveredProduct] = useState(null);
 
-  // Ordenar productos: primero los que tienen promoción
+  // Ordenar productos: primero los que tienen promoción y mejor valoración
   const sortedProducts = [...products].sort((a, b) => {
     if (a.promocion === "si" && b.promocion !== "si") return -1;
     if (a.promocion !== "si" && b.promocion === "si") return 1;
-    return 0;
+    return (b.rating || 0) - (a.rating || 0);
   });
 
   // Formateador de precios
@@ -93,25 +136,14 @@ const Productos = () => {
     setSelectedProduct(null);
   };
 
-  // Validación y formato de teléfono
-  const formatPhoneNumber = (phone) => {
-    if (!phone) return null;
-    const cleaned = phone.toString().replace(/\D/g, "");
-    if (cleaned.startsWith("57")) return `+${cleaned}`;
-    if (cleaned.length === 10) return `+57${cleaned}`;
-    return null;
-  };
-
   // Redirección a WhatsApp
   const handleWhatsAppRedirect = (product) => {
-    if (!product.contacto) {
-      alert("Este producto no tiene contacto asignado");
-      return;
-    }
+    const formattedPhone = product.contacto
+      ? `+57${product.contacto.toString().replace(/\D/g, "").slice(-10)}`
+      : null;
 
-    const formattedPhone = formatPhoneNumber(product.contacto);
     if (!formattedPhone) {
-      alert("Número inválido. Debe ser un número colombiano de 10 dígitos");
+      alert("Este producto no tiene contacto asignado");
       return;
     }
 
@@ -120,34 +152,15 @@ const Productos = () => {
       ? calculateDiscountedPrice(product.precio, product.porcentajeDescuento)
       : product.precio;
 
-    let message = `¡Hola! Estoy interesado en comprar el producto:\n\n*${product.nombre}*`;
-
-    // Agregar categoría y línea si existen
-    if (product.categoria || product.linea) {
-      message += `\n\n• Categoría: ${product.categoria || "No especificada"}`;
-      message += `\n• Línea: ${product.linea || "No especificada"}`;
-    }
-
-    // Mensaje para productos en promoción
+    let message = `¡Hola! Estoy interesado en el producto:\n\n*${product.nombre}*`;
+    message += `\n\n• Precio: ${formatPrice(isPromo ? discountedPrice : product.precio)}`;
+    
     if (isPromo) {
-      message += `\n\n• Precio regular: ${formatPrice(product.precio)}`;
-      message += `\n\n📢 *¡OFERTA ESPECIAL!* 📢`;
-      message += `\n  - Descuento: ${product.porcentajeDescuento}%`;
-      message += `\n  - Precio final: ${formatPrice(discountedPrice)}`;
-      message += `\n  - Ahorras: ${formatPrice(
-        product.precio - discountedPrice
-      )}`;
-    } else {
-      // Mensaje para productos sin promoción
-      message += `\n\n• Precio: ${formatPrice(product.precio)}`;
+      message += `\n• Descuento: ${product.porcentajeDescuento}%`;
+      message += `\n• Precio regular: ${formatPrice(product.precio)}`;
     }
-
-    // Agregar descripción si existe
-    if (product.descripcion) {
-      message += `\n\nDescripción:\n${product.descripcion}`;
-    }
-
-    message += "\n\nPor favor, indíqueme cómo proceder con la compra.";
+    
+    message += `\n\nPor favor, indíqueme disponibilidad y forma de pago.`;
 
     window.open(
       `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`,
@@ -163,8 +176,13 @@ const Productos = () => {
   // Estados de carga
   if (status === "loading") {
     return (
-      <Box display="flex" justifyContent="center" mt={10}>
-        <CircularProgress size={60} />
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center"
+        minHeight="50vh"
+      >
+        <CircularProgress size={60} thickness={4} />
       </Box>
     );
   }
@@ -172,8 +190,22 @@ const Productos = () => {
   if (status === "failed") {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Alert severity="error">
+        <Alert 
+          severity="error" 
+          sx={{ 
+            borderRadius: 2,
+            boxShadow: theme.shadows[1]
+          }}
+        >
           Error al cargar los productos. Por favor intenta nuevamente.
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => dispatch(fetchProducts())}
+            sx={{ ml: 2 }}
+          >
+            Reintentar
+          </Button>
         </Alert>
       </Container>
     );
@@ -183,8 +215,8 @@ const Productos = () => {
     <Container
       maxWidth="xl"
       sx={{
-        py: 4,
-        px: 2, // Padding horizontal constante para todos los dispositivos
+        py: 6,
+        px: { xs: 2, sm: 3 },
       }}
     >
       <ModalDetailProduct
@@ -194,75 +226,150 @@ const Productos = () => {
         onWhatsAppClick={handleWhatsAppRedirect}
       />
 
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        align="center"
-        sx={{ fontWeight: 600, mb: 3, color: "text.primary" }}
-      >
-        Catálogo De Productos
-      </Typography>
-
-      <Divider sx={{ mb: 4 }} />
+      <Box textAlign="center" mb={6}>
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{ 
+            fontWeight: 700,
+            color: "text.primary",
+            mb: 2,
+            position: "relative",
+            display: "inline-block",
+            "&:after": {
+              content: '""',
+              position: "absolute",
+              bottom: -8,
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 80,
+              height: 4,
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: 2,
+            }
+          }}
+        >
+          Nuestro Catálogo
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          color="text.secondary"
+          maxWidth="md"
+          mx="auto"
+        >
+          Descubre nuestra selección premium de productos con la mejor calidad y precios competitivos
+        </Typography>
+      </Box>
 
       {sortedProducts.length === 0 ? (
-        <Box textAlign="center" py={10}>
-          <Typography variant="h5" color="text.secondary">
+        <Box 
+          textAlign="center" 
+          py={10}
+          sx={{
+            backgroundColor: theme.palette.background.default,
+            borderRadius: 3,
+            boxShadow: theme.shadows[1]
+          }}
+        >
+          <Typography variant="h5" color="text.secondary" mb={2}>
             No hay productos disponibles
           </Typography>
+          <Button 
+            variant="contained" 
+            onClick={() => dispatch(fetchProducts())}
+          >
+            Recargar catálogo
+          </Button>
         </Box>
       ) : (
         <Grid
           container
-          spacing={2}
+          spacing={4}
           sx={{
-            alignItems: "stretch", // Fuerza igual altura en todas las cards
-            [theme.breakpoints.down("sm")]: {
-              px: 2, // Espaciado lateral en móviles
-            },
+            justifyContent: "center",
           }}
         >
           {sortedProducts.map((product) => {
             const isPromo = product.promocion === "si";
             const discountedPrice = isPromo
-              ? calculateDiscountedPrice(
-                  product.precio,
-                  product.porcentajeDescuento
-                )
+              ? calculateDiscountedPrice(product.precio, product.porcentajeDescuento)
               : product.precio;
 
             return (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+              <Grid 
+                key={product.id} 
+                item 
+                xs={12} 
+                sm={6} 
+                md={4} 
+                lg={3}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 {isPromo ? (
-                  <PromoBadge badgeContent="OFERTA" overlap="rectangular">
-                    <ProductCard ispromo="true">
-                      <CardMedia
-                        component="img"
-                        sx={{
-                          width: "90%", // Ocupa todo el ancho disponible
-                          height: { xs: 180, sm: 160, md: 180 }, // Altura responsive
-                          maxHeight: "190px", // Límite máximo
-                          objectFit: "cover",
-                          p: 1, // Padding reducido
-                          backgroundColor: theme.palette.grey[50],
-                          display: "flex", // Para centrado adicional
-                          margin: "0 auto", // Centrado horizontal
-                          alignItems: "center",
-                        }}
-                        image={product.imagen || "/placeholder-product.png"}
-                        alt={product.nombre}
-                        onClick={() => handleOpenModal(product)}
-                      />
+                  <PromoBadge badgeContent="PROMO" overlap="rectangular">
+                    <ProductCard 
+                      ispromo="true"
+                      onMouseEnter={() => setHoveredProduct(product.id)}
+                      onMouseLeave={() => setHoveredProduct(null)}
+                    >
+                      <CardActionArea onClick={() => handleOpenModal(product)}>
+                        <Box
+                          sx={{
+                            position: "relative",
+                            paddingTop: "75%", // Relación de aspecto 4:3
+                            overflow: "hidden",
+                          }}
+                        >
+                          <CardMedia
+                            component="img"
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              transition: "transform 0.5s ease",
+                              transform: hoveredProduct === product.id ? "scale(1.05)" : "scale(1)",
+                            }}
+                            image={product.imagen || "/placeholder-product.png"}
+                            alt={product.nombre}
+                          />
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              p: 1,
+                              background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
+                            }}
+                          >
+                            <Chip
+                              label={`${product.porcentajeDescuento}% OFF`}
+                              color="error"
+                              size="small"
+                              sx={{
+                                fontWeight: "bold",
+                                mr: 1,
+                              }}
+                            />
+                            {product.rating && (
+                              <RatingStars rating={product.rating} />
+                            )}
+                          </Box>
+                        </Box>
+                      </CardActionArea>
+
                       <CardContent
                         sx={{
                           flexGrow: 1,
                           display: "flex",
                           flexDirection: "column",
-                          pt: 1,
-                          pb: 2,
-                          px: 2,
-                          height: "100%", // Asegura que el contenido ocupe todo el espacio disponible
+                          p: 3,
                         }}
                       >
                         <Typography
@@ -270,42 +377,26 @@ const Productos = () => {
                           variant="h6"
                           component="h3"
                           sx={{
-                            mb: 1,
                             fontWeight: 600,
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: "vertical",
                             overflow: "hidden",
+                            minHeight: theme.typography.h6.lineHeight * 2,
                           }}
                         >
                           {product.nombre}
                         </Typography>
 
                         <Box sx={{ mt: "auto" }}>
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            gap={1}
-                            mb={1}
-                          >
+                          <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                             <Typography
-                              variant="body1"
+                              variant="h6"
                               color="error.main"
-                              fontWeight={600}
+                              fontWeight={700}
                             >
                               {formatPrice(discountedPrice)}
                             </Typography>
-                            <Chip
-                              label={`${product.porcentajeDescuento}% OFF`}
-                              color="error"
-                              size="small"
-                            />
-                          </Box>
-                          <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            mt={1}
-                          >
                             <Typography
                               variant="body2"
                               color="text.secondary"
@@ -313,87 +404,112 @@ const Productos = () => {
                             >
                               {formatPrice(product.precio)}
                             </Typography>
-                            <Typography variant="caption" color="success.main">
-                              Ahorras{" "}
-                              {formatPrice(product.precio - discountedPrice)}
-                            </Typography>
-                          </Box>
-                          <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            mt={1}
-                          >
+                          </Stack>
+
+                          <Stack direction="row" justifyContent="space-between" mb={2}>
+                            <Chip
+                              label={product.categoria || "General"}
+                              color="secondary"
+                              size="small"
+                              variant="outlined"
+                            />
                             <Typography
                               variant="caption"
-                              color={
-                                product.stock > 0 ? "success.main" : "error"
-                              }
+                              color={product.stock > 0 ? "success.main" : "error"}
+                              fontWeight="medium"
                             >
-                              {product.stock > 0 ? `Disponible` : "Agotado"}
+                              {product.stock > 0 ? `${product.stock} disponibles` : "Agotado"}
                             </Typography>
-                            <Typography
-                              component="span"
-                              color="text.secondary"
-                              ml={1}
+                          </Stack>
+
+                          <Stack direction="row" spacing={1}>
+                            <Button
+                              fullWidth
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              startIcon={<WhatsAppIcon />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleWhatsAppRedirect(product);
+                              }}
+                              disabled={product.stock === 0}
+                              sx={{
+                                borderRadius: 2,
+                                textTransform: "none",
+                                fontWeight: "medium",
+                              }}
                             >
-                              ({product.stock} Unidades)
-                            </Typography>
-                          </Box>
-                          <Box sx={{ p: 2 }}>
-                          <Button
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            sx={{ mt: 2 }}
-                            onClick={() => handleWhatsAppRedirect(product)}
-                            disabled={product.stock === 0}
-                          >
-                            {product.stock > 0 ? "Comprar ahora" : "Agotado"}
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            fullWidth
-                            size="small"
-                            onClick={() => handleOpenModal(product)}
-                            color="secondary"
-                            sx={{ mt: 1.5 }}
-                          >
-                            Ver Detalles
-                          </Button>
-                          </Box>
+                              Consultar
+                            </Button>
+                            <Tooltip title="Ver detalles">
+                              <IconButton
+                                color="primary"
+                                onClick={() => handleOpenModal(product)}
+                                sx={{
+                                  border: `1px solid ${theme.palette.primary.main}`,
+                                }}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
                         </Box>
                       </CardContent>
                     </ProductCard>
                   </PromoBadge>
                 ) : (
-                  <ProductCard ispromo="false">
-                    <CardMedia
-                      component="img"
-                      sx={{
-                        width: "90%", // Ocupa todo el ancho disponible
-                        height: { xs: 180, sm: 160, md: 180 }, // Altura responsive
-                        maxHeight: "190px", // Límite máximo
-                        objectFit: "cover",
-                        p: 1, // Padding reducido
-                        backgroundColor: theme.palette.grey[50],
-                        display: "flex", // Para centrado adicional
-                        margin: "0 auto", // Centrado horizontal
-                        alignItems: "center",
-                      }}
-                      image={product.imagen || "/placeholder-product.png"}
-                      alt={product.nombre}
-                      onClick={() => handleOpenModal(product)}
-                    />
+                  <ProductCard 
+                    ispromo="false"
+                    onMouseEnter={() => setHoveredProduct(product.id)}
+                    onMouseLeave={() => setHoveredProduct(null)}
+                  >
+                    <CardActionArea onClick={() => handleOpenModal(product)}>
+                      <Box
+                        sx={{
+                          position: "relative",
+                          paddingTop: "75%",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          sx={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            transition: "transform 0.5s ease",
+                            transform: hoveredProduct === product.id ? "scale(1.05)" : "scale(1)",
+                          }}
+                          image={product.imagen || "/placeholder-product.png"}
+                          alt={product.nombre}
+                        />
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            p: 1,
+                            background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
+                          }}
+                        >
+                          {product.rating && (
+                            <RatingStars rating={product.rating} />
+                          )}
+                        </Box>
+                      </Box>
+                    </CardActionArea>
+
                     <CardContent
                       sx={{
                         flexGrow: 1,
                         display: "flex",
                         flexDirection: "column",
-                        pt: 1,
-                        pb: 2,
-                        px: 2,
-                        height: "100%", // Asegura que el contenido ocupe todo el espacio disponible
+                        p: 3,
                       }}
                     >
                       <Typography
@@ -401,12 +517,12 @@ const Productos = () => {
                         variant="h6"
                         component="h3"
                         sx={{
-                          mb: 1,
                           fontWeight: 600,
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: "vertical",
                           overflow: "hidden",
+                          minHeight: theme.typography.h6.lineHeight * 2,
                         }}
                       >
                         {product.nombre}
@@ -414,56 +530,62 @@ const Productos = () => {
 
                       <Box sx={{ mt: "auto" }}>
                         <Typography
-                          variant="body1"
+                          variant="h6"
                           color="primary.main"
-                          fontWeight={600}
+                          fontWeight={700}
                           mb={1}
                         >
                           {formatPrice(product.precio)}
                         </Typography>
 
-                        <Box display="flex" justifyContent="space-between">
+                        <Stack direction="row" justifyContent="space-between" mb={2}>
+                          <Chip
+                            label={product.categoria || "General"}
+                            color="secondary"
+                            size="small"
+                            variant="outlined"
+                          />
                           <Typography
                             variant="caption"
                             color={product.stock > 0 ? "success.main" : "error"}
+                            fontWeight="medium"
                           >
-                            {product.stock > 0 ? `Disponible` : "Agotado"}
+                            {product.stock > 0 ? `${product.stock} disponibles` : "Agotado"}
                           </Typography>
-                          <Typography
-                            component="span"
-                            color="text.secondary"
-                            ml={1}
-                          >
-                            ({product.stock} Unidades)
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={product.linea || "General"}
-                          color="secondary"
-                          size="small"
-                        />
-                        <Box sx={{ p: 2 }}>
+                        </Stack>
+
+                        <Stack direction="row" spacing={1}>
                           <Button
                             fullWidth
                             variant="outlined"
                             color="primary"
                             size="small"
-                            sx={{ mt: 2, mb: 2 }}
-                            onClick={() => handleWhatsAppRedirect(product)}
+                            startIcon={<WhatsAppIcon />}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleWhatsAppRedirect(product);
+                            }}
                             disabled={product.stock === 0}
+                            sx={{
+                              borderRadius: 2,
+                              textTransform: "none",
+                              fontWeight: "medium",
+                            }}
                           >
-                            {product.stock > 0 ? "Consultar" : "Agotado"}
+                            Consultar
                           </Button>
-                          <Button
-                            variant="outlined"
-                            fullWidth
-                            size="small"
-                            onClick={() => handleOpenModal(product)}
-                            color="secondary"
-                          >
-                            Ver Detalles
-                          </Button>
-                        </Box>
+                          <Tooltip title="Ver detalles">
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleOpenModal(product)}
+                              sx={{
+                                border: `1px solid ${theme.palette.primary.main}`,
+                              }}
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
                       </Box>
                     </CardContent>
                   </ProductCard>

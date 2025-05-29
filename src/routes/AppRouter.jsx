@@ -14,8 +14,19 @@ const theme = createTheme({
     terciary: { main: "#ffffff"},
     background: { default: "#f5f5f5", paper: "#ffffff" },
     success: { main: "#4caf50", dark: "#388e3c" },
-    black: { main: "#000000"}
+    black: { main: "#000000"},
+      chartColors: [
+      '#0088FE', '#00C49F', '#FFBB28', '#FF8042', 
+      '#A4DE6C', '#D0ED57', '#8884d8', '#82CA9D'
+    ],
   },
+typography: {
+  fontFamily: '"Open Sans", sans-serif',
+  h4: {
+    fontFamily: '"Bebas Neue", cursive', // Fuente diferente solo para h4
+  }
+  },
+
 });
 
 // Lazy loading de componentes

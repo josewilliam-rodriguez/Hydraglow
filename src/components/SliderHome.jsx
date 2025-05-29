@@ -3,24 +3,25 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Box, Button, Typography } from '@mui/material';
 import Slider from 'react-slick';
+import producto1 from '../images/product1.jpeg'
 
 
 const SliderHome = () => {
     const items = [
         {
-          image: "https://th.bing.com/th/id/R.0d6bcb347e148d82325214af1356a232?rik=fASvVirccmHt%2bA&riu=http%3a%2f%2fmaquillajestudio.cl%2fwp-content%2fuploads%2f2017%2f09%2fhomemade-hair-conditioner.jpg&ehk=IQ%2b%2fBsWyHaQt98%2fZUE3mwpf0ZeizEQZF8EqRbhsmsfM%3d&risl=&pid=ImgRaw&r=0",
+          image: "https://res.cloudinary.com/duqoqmq8i/image/upload/v1748466644/f004ff78-c6ff-4756-9e65-6197e5f0c501_ickesn.jpg",
           title: "Productos naturales de alta calidad",
           description: "producto para la piel 100% calificado ",
           link: "/Productos"
         },
         {
-          image: "https://nanova.org/wp-content/uploads/2024/02/lh95b720.bmp.jpg",
+          image: "https://res.cloudinary.com/duqoqmq8i/image/upload/v1748466639/fc95777e-3e5d-4068-b5da-cff93e89c6d1_c7gigr.jpg",
           title: "Perros felices, dueños tranquilos",
           description: "Productos especial para perros exigentes.",
           link: "/Productos"
         },
         {
-          image: "https://zaragozatop.com/wp-content/uploads/2023/09/los-beneficios-de-los-productos-naturales-en-los-herbolarios-1.jpg",
+          image: "https://res.cloudinary.com/duqoqmq8i/image/upload/v1748466635/05888b8c-5af9-4e94-8c46-758472b2f754_icf2ow.jpg",
           title: "Promociones de la semana",
           description: "No te pierdas nuestras ofertas exclusivas.",
           link: "/Productos"

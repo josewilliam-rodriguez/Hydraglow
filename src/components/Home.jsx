@@ -16,7 +16,7 @@ const Home = () => {
         {/* Contenido de tus promociones */}
         <SliderPromociones />
       </div>
-      <br />
+
       <br />
       <CompanyValues />
       <br />

@@ -20,62 +20,105 @@ import Slider from "react-slick";
 import ProductCard from "./ProductCard";
 
 const StyledSlider = styled(Slider)(({ theme }) => ({
-  width: '100%', // Ocupa todo el ancho disponible
-  maxWidth: '1200px', // Ancho máximo del slider
-  margin: '0 auto', // Centrado horizontal
+  width: '100%',
+  maxWidth: '1400px',
+  margin: '0 auto',
+  padding: theme.spacing(0, 1),
   
   "& .slick-slide": {
-    padding: theme.spacing(0, 1),
+    padding: theme.spacing(1),
     boxSizing: "border-box",
-    height: '100%', // Altura completa del contenedor
-    transition: "transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1)",
+    display: 'flex !important', // Añade esto
+    justifyContent: 'center', 
+    height: 'auto',
+    transition: "transform 0.3s ease-in-out",
     
     "& > div": {
       height: "100%",
+      width: '100%',
       display: "flex",
-      justifyContent: "center", // Centra las tarjetas horizontalmente
+      justifyContent: "center",
     },
+    
+    "&:focus": {
+      outline: 'none'
+    }
   },
   
   "& .slick-list": {
     margin: theme.spacing(0, -1),
-    overflow: "hidden",
-    height: '100%', // Altura completa
+    overflow: 'visible',
+    padding: theme.spacing(1, 0),
   },
   
   "& .slick-track": {
     display: "flex",
-    alignItems: "center", // Centra verticalmente
-    height: '100%', // Altura completa
+    alignItems: "stretch",
+     padding: theme.spacing(1, 0),
   },
   
-  // Estilos para las flechas de navegación
   "& .slick-prev, & .slick-next": {
-    width: '40px',
-    height: '40px',
+    width: 40,
+    height: 40,
     zIndex: 1,
+    background: theme.palette.background.paper,
+    borderRadius: '50%',
+    boxShadow: theme.shadows[2],
+    transition: 'all 0.3s ease',
+    
+    "&:hover, &:focus": {
+      background: theme.palette.background.paper,
+      transform: 'scale(1.1)'
+    },
+    
     "&:before": {
-      fontSize: '30px',
+      fontSize: 24,
       color: theme.palette.primary.main,
+      opacity: 1,
     },
   },
   
   "& .slick-prev": {
-    left: '-45px',
+    left: -15,
+    [theme.breakpoints.down('md')]: {
+      left: -10
+    }
   },
   
   "& .slick-next": {
-    right: '-45px',
+    right: -15,
+    [theme.breakpoints.down('md')]: {
+      right: -10
+    }
   },
   
-  // Estilos para los puntos de navegación
   "& .slick-dots": {
-    bottom: '-30px',
-    "& li button:before": {
-      fontSize: '12px',
-      color: theme.palette.primary.main,
-    },
-  },
+    bottom: -30,
+    
+    "& li": {
+      margin: 0,
+      width: 12,
+      height: 12,
+      
+      "& button": {
+        padding: 0,
+        width: 12,
+        height: 12,
+        
+        "&:before": {
+          fontSize: 10,
+          color: theme.palette.grey[400],
+          opacity: 1,
+          width: 12,
+          height: 12,
+        }
+      },
+      
+      "&.slick-active button:before": {
+        color: theme.palette.primary.main,
+      }
+    }
+  }
 }));
 
 const SliderPromociones = () => {
@@ -90,60 +133,94 @@ const SliderPromociones = () => {
     if (status === "idle") dispatch(fetchPromociones());
   }, [status, dispatch]);
 
+  // Configuración del autoplay
   const settings = {
     dots: true,
     infinite: productosPromocion.length > 1,
-    speed: 800,  // Aumenta a 0.8 segundos
-    slidesToShow: isMobile ? 1 : isTablet ? 2 : 3,
-    slidesToScroll: isMobile ? 1 : isTablet ? 2 : 3,
-    autoplay: !isMobile,
-    autoplaySpeed: 4000,
+    speed: 800,
+    slidesToShow: isMobile ? 1 : isTablet ? 2 : 4,
+    slidesToScroll: isMobile ? 1 : isTablet ? 2 : 4,
+    centerMode: true, // Añade esto para centrar las slides
+  centerPadding: '0px', // Asegúrate que sea 0 para no tener padding extra
+    autoplay: true, // Habilita el autoplay
+    autoplaySpeed: 5000, // Cambia cada 5 segundos (5000ms)
+    pauseOnHover: true, // Pausa al hacer hover
+    pauseOnFocus: true, // Pausa al enfocar
     arrows: !isMobile,
-    centerMode: false,
-    focusOnSelect: false,
     swipe: true,
-    fade: false,
     swipeToSlide: true,
     draggable: true,
-    touchThreshold: 15,
-    waitForAnimate: true,
-    useCSS: true,
-    cssEase: 'ease-out',
+    cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
     responsive: [
       {
-        breakpoint: theme.breakpoints.values.sm,
+        breakpoint: theme.breakpoints.values.lg,
         settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          arrows: false,
-        },
+                slidesToShow: 3,
+        slidesToScroll: 3,
+        centerMode: true, // Mantén esto en los breakpoints
+        centerPadding: '0px'
+        }
       },
       {
         breakpoint: theme.breakpoints.values.md,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
-        },
+          arrows: false
+        }
       },
-    ],
+      {
+        breakpoint: theme.breakpoints.values.sm,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: true,
+          arrows: false,
+          autoplaySpeed: 6000 // Más lento en móviles
+        }
+      }
+    ]
   };
 
   if (status === "loading") {
     return (
-      <Box display="flex" justifyContent="center" py={4}>
-        <CircularProgress size={60} />
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center"
+        minHeight={300}
+      >
+        <CircularProgress size={60} thickness={4} />
       </Box>
     );
   }
 
   if (status === "failed") {
     return (
-      <Box textAlign="center" py={2}>
-        <Typography color="error">Error al cargar promociones</Typography>
+      <Box 
+        textAlign="center" 
+        py={4}
+        sx={{
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: 2,
+          boxShadow: theme.shadows[1]
+        }}
+      >
+        <Typography variant="h6" color="error" gutterBottom>
+          Error al cargar promociones
+        </Typography>
         <Button
-          variant="outlined"
+          variant="contained"
+          color="primary"
           onClick={() => dispatch(fetchPromociones())}
-          sx={{ mt: 2 }}
+          sx={{ 
+            mt: 2,
+            px: 3,
+            py: 1,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 'medium'
+          }}
         >
           Reintentar
         </Button>
@@ -157,65 +234,106 @@ const SliderPromociones = () => {
 
   return (
     <Box
+      component="section"
       sx={{
-        my: 6,
-        px: isMobile ? 2 : 4,
-        position: "relative",
-        maxWidth: '100vw', // Limita el ancho máximo
-        
-        overflow: 'visible', // Oculta cualquier desbordamiento
+        py: isMobile ? 4 : 6,
+        px: isMobile ? 1 : 2,
+        backgroundColor: 'background.default',
+        position: 'relative',
+        overflow: 'hidden',
+        '&:before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '50%',
+          backgroundColor: theme.palette.primary.light,
+          opacity: 0.05,
+          zIndex: 0
+        }
       }}
     >
-      <Typography
-        variant="h4"
-        component="h2"
-        gutterBottom
+      <Box
         sx={{
-          textAlign: "center",
-          mb: 4,
-          fontWeight: "bold",
-          color: theme.palette.primary.main,
-          textTransform: "uppercase",
-          letterSpacing: 1.2,
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '1800px',
+          margin: '0 auto'
         }}
       >
-        Ofertas Especiales
-      </Typography>
+        <Typography
+          variant={isMobile ? "h5" : "h4"}
+          component="h2"
+          sx={{
+            textAlign: "center",
+            mb: isMobile ? 2 : 4,
+            fontWeight: 700,
+            color: theme.palette.text.primary,
+            position: 'relative',
+            display: 'inline-block',
+            width: '100%',
+            '&:after': {
+              content: '""',
+              display: 'block',
+              width: '80px',
+              height: '4px',
+              backgroundColor: theme.palette.primary.main,
+              margin: `${theme.spacing(2)} auto 0`,
+              borderRadius: '2px'
+            }
+          }}
+        >
+          Ofertas Especiales
+        </Typography>
 
-      <Box sx={{
-        maxWidth: '60%',
-        height: '60%',
-        mx: 'auto',
-        position: 'relative',
-      }}>
-        <StyledSlider {...settings}>
-          {productosPromocion.map((producto) => (
-            <Box
-              key={producto.id}
-              sx={{
-                px: 1,
-                height: "100%",
-                display: "flex",
-                ...(!isMobile && {
-                  "&:hover": {
-                    transform: "scale(1.02)",
-                    transition: "transform 0.3s ease",
-                  },
-                }),
-              }}
-            >
-              <ProductCard
-                producto={producto}
-                isPromocion={true}
-                sx={{ 
-                  height: "100%", 
-                  flex: 1,
-                  maxWidth: '100%', // Asegura que las tarjetas no excedan el ancho
+        <Typography
+          variant="subtitle1"
+          color="textSecondary"
+          sx={{
+            textAlign: "center",
+            mb: isMobile ? 3 : 5,
+            maxWidth: '700px',
+            margin: '0 auto',
+            px: 2
+          }}
+        >
+          Descubre nuestras promociones exclusivas por tiempo limitado
+        </Typography>
+
+        <Box sx={{ px: isMobile ? 0 : 2 }}>
+          <StyledSlider {...settings}>
+            {productosPromocion.map((producto) => (
+              <Box
+                key={producto.id}
+                sx={{
+                  px: 1,
+                  height: "100%",
+                  display: "flex",
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: isMobile ? 'none' : 'translateY(-8px)'
+                  }
                 }}
-              />
-            </Box>
-          ))}
-        </StyledSlider>
+              >
+                <ProductCard
+                  producto={producto}
+                  isPromocion={true}
+                  sx={{ 
+                    height: "100%", 
+                    width: '100%', // Añade esto
+                    maxWidth: '300px', // Establece un ancho máximo si es necesario
+                    flex: 1,
+                    boxShadow: theme.shadows[2],
+                    '&:hover': {
+                      boxShadow: theme.shadows[4]
+                    }
+                  }}
+                />
+              </Box>
+            ))}
+          </StyledSlider>
+        </Box>
       </Box>
     </Box>
   );
