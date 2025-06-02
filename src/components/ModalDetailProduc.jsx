@@ -319,7 +319,7 @@ const ModalDetailProduct = ({ open, onClose, product, isPromocion }) => {
               <Button
                 variant="contained"
                 fullWidth
-                color={isPromocion ? "primary" : "secondary"}
+                color={isPromocion ? "secondary" : "primary"}
                 size="small"
                 onClick={handleWhatsAppClick}
                 sx={{ mb: 1 }}

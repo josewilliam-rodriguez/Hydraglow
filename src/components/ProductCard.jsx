@@ -168,7 +168,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
                 gap: 0.5,
               }}
             >
-              <Tooltip title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}>
+              {/* <Tooltip title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}>
                 <IconButton
                   size="small"
                   onClick={toggleFavorite}
@@ -198,7 +198,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
                 >
                   <ShareIcon fontSize="small" />
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
             </Box>
 
             <CardMedia
@@ -310,7 +310,7 @@ const ProductCard = ({ producto, isPromocion = false }) => {
               <Button
                 variant="contained"
                 fullWidth
-                color={isPromocion ? "error" : "primary"}
+                color={isPromocion ? "primary" : "error"}
                 size="medium"
                 onClick={handleWhatsAppRedirect}
                 disabled={producto.stock === 0}

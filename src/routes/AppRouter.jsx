@@ -21,10 +21,14 @@ const theme = createTheme({
     ],
   },
 typography: {
-  fontFamily: '"Open Sans", sans-serif',
-  h4: {
-    fontFamily: '"Bebas Neue", cursive', // Fuente diferente solo para h4
-  }
+    fontFamily: '"Roboto Condensed", sans-serif',
+    h4: {
+      fontFamily: '"Roboto Condensed", sans-serif',
+      fontWeight: 400, // Bebas Neue solo tiene "regular" (400)
+      letterSpacing: '1px', // Espaciado para mejor legibilidad
+      lineHeight: 1.2, // Reduce el espacio entre líneas
+      textTransform: 'uppercase', // Aprovecha su estilo natural
+    },
   },
 
 });

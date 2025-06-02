@@ -11,15 +11,20 @@ import {
   Box,
   Chip,
   Alert,
-  Divider,
   Button,
   useTheme,
   Badge,
   IconButton,
   Tooltip,
-  Avatar,
-  CardActionArea,
   Stack,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  FormControl,
+  Select,
+  Divider,
+  Paper,
+  CardActionArea,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -34,6 +39,9 @@ import {
   Visibility as VisibilityIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon,
+  Search as SearchIcon,
+  FilterAlt as FilterIcon,
+  Clear as ClearIcon,
 } from "@mui/icons-material";
 
 // Componente de Badge para promociones mejorado
@@ -103,13 +111,41 @@ const Productos = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("todas");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
-  // Ordenar productos: primero los que tienen promoción y mejor valoración
-  const sortedProducts = [...products].sort((a, b) => {
-    if (a.promocion === "si" && b.promocion !== "si") return -1;
-    if (a.promocion !== "si" && b.promocion === "si") return 1;
-    return (b.rating || 0) - (a.rating || 0);
-  });
+  // Obtener categorías únicas
+  const categories = ["todas", ...new Set(products.map(product => product.categoria || "General"))];
+
+  // Efecto para filtrar productos
+  useEffect(() => {
+    let result = [...products];
+    
+    // Filtrar por categoría
+    if (selectedCategory !== "todas") {
+      result = result.filter(product => 
+        (product.categoria || "General") === selectedCategory
+      );
+    }
+    
+    // Filtrar por término de búsqueda
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(product => 
+        product.nombre.toLowerCase().includes(term) || 
+        (product.descripcion && product.descripcion.toLowerCase().includes(term))
+  )}
+    
+    // Ordenar productos: primero los que tienen promoción y mejor valoración
+    result.sort((a, b) => {
+      if (a.promocion === "si" && b.promocion !== "si") return -1;
+      if (a.promocion !== "si" && b.promocion === "si") return 1;
+      return (b.rating || 0) - (a.rating || 0);
+    });
+    
+    setFilteredProducts(result);
+  }, [products, searchTerm, selectedCategory]);
 
   // Formateador de precios
   const formatPrice = (price) => {
@@ -166,6 +202,12 @@ const Productos = () => {
       `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`,
       "_blank"
     );
+  };
+
+  // Limpiar filtros
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("todas");
   };
 
   // Carga inicial de productos
@@ -261,7 +303,93 @@ const Productos = () => {
         </Typography>
       </Box>
 
-      {sortedProducts.length === 0 ? (
+      {/* Filtros y buscador */}
+      <Paper 
+        elevation={2} 
+        sx={{ 
+          p: 3, 
+          mb: 4,
+          borderRadius: 3,
+          backgroundColor: theme.palette.background.paper,
+        }}
+      >
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={6} md={4}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon color="primary" />
+                  </InputAdornment>
+                ),
+                endAdornment: searchTerm && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      onClick={() => setSearchTerm("")}
+                      size="small"
+                    >
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                variant="outlined"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <FilterIcon color="primary" />
+                  </InputAdornment>
+                }
+                sx={{
+                  "& .MuiSelect-select": {
+                    display: "flex",
+                    alignItems: "center",
+                  }
+                }}
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category === "todas" ? "Todas las categorías" : category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleClearFilters}
+              disabled={searchTerm === "" && selectedCategory === "todas"}
+              startIcon={<ClearIcon />}
+            >
+              Limpiar filtros
+            </Button>
+          </Grid>
+        </Grid>
+        
+        {filteredProducts.length !== products.length && (
+          <Typography variant="body2" color="text.secondary" mt={2}>
+            Mostrando {filteredProducts.length} de {products.length} productos
+          </Typography>
+        )}
+      </Paper>
+
+      {filteredProducts.length === 0 ? (
         <Box 
           textAlign="center" 
           py={10}
@@ -272,10 +400,22 @@ const Productos = () => {
           }}
         >
           <Typography variant="h5" color="text.secondary" mb={2}>
-            No hay productos disponibles
+            No se encontraron productos
+          </Typography>
+          <Typography variant="body1" color="text.secondary" mb={3}>
+            {searchTerm || selectedCategory !== "todas" 
+              ? "Intenta con otros términos de búsqueda o categorías" 
+              : "No hay productos disponibles en este momento"}
           </Typography>
           <Button 
             variant="contained" 
+            onClick={handleClearFilters}
+            sx={{ mr: 2 }}
+          >
+            Limpiar búsqueda
+          </Button>
+          <Button 
+            variant="outlined" 
             onClick={() => dispatch(fetchProducts())}
           >
             Recargar catálogo
@@ -289,7 +429,7 @@ const Productos = () => {
             justifyContent: "center",
           }}
         >
-          {sortedProducts.map((product) => {
+          {filteredProducts.map((product) => {
             const isPromo = product.promocion === "si";
             const discountedPrice = isPromo
               ? calculateDiscountedPrice(product.precio, product.porcentajeDescuento)

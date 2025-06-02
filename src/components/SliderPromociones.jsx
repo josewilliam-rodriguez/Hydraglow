@@ -30,6 +30,7 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
     boxSizing: "border-box",
     display: 'flex !important', // Añade esto
     justifyContent: 'center', 
+    alignItems: 'center',
     height: 'auto',
     transition: "transform 0.3s ease-in-out",
     
@@ -38,6 +39,7 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
       width: '100%',
       display: "flex",
       justifyContent: "center",
+      alignItems: "center",
     },
     
     "&:focus": {
@@ -138,9 +140,9 @@ const SliderPromociones = () => {
     dots: true,
     infinite: productosPromocion.length > 1,
     speed: 800,
-    slidesToShow: isMobile ? 1 : isTablet ? 2 : 4,
+    slidesToShow: Math.min(isMobile ? 1 : isTablet ? 2 : 4, productosPromocion.length),
     slidesToScroll: isMobile ? 1 : isTablet ? 2 : 4,
-    centerMode: true, // Añade esto para centrar las slides
+    centerMode: productosPromocion.length >= (isMobile ? 1 : isTablet ? 2 : 4),
   centerPadding: '0px', // Asegúrate que sea 0 para no tener padding extra
     autoplay: true, // Habilita el autoplay
     autoplaySpeed: 5000, // Cambia cada 5 segundos (5000ms)
