@@ -23,23 +23,18 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
   width: '100%',
   maxWidth: '1400px',
   margin: '0 auto',
-  padding: theme.spacing(0, 1),
   
   "& .slick-slide": {
     padding: theme.spacing(1),
-    boxSizing: "border-box",
-    display: 'flex !important', // Añade esto
-    justifyContent: 'center', 
+    display: 'flex !important',
+    justifyContent: 'center',
     alignItems: 'center',
     height: 'auto',
-    transition: "transform 0.3s ease-in-out",
     
     "& > div": {
-      height: "100%",
       width: '100%',
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
+      display: 'flex',
+      justifyContent: 'center',
     },
     
     "&:focus": {
@@ -48,15 +43,19 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
   },
   
   "& .slick-list": {
-    margin: theme.spacing(0, -1),
     overflow: 'visible',
-    padding: theme.spacing(1, 0),
+    padding: '0 !important',
+    margin: theme.spacing(0, -1),
+    [theme.breakpoints.down('sm')]: {
+      padding: '0 15px !important', // Espacio lateral en móviles
+      margin: theme.spacing(0, -2),
+    }
   },
   
   "& .slick-track": {
-    display: "flex",
-    alignItems: "stretch",
-     padding: theme.spacing(1, 0),
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(1, 0),
   },
   
   "& .slick-prev, & .slick-next": {
@@ -78,6 +77,9 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
       color: theme.palette.primary.main,
       opacity: 1,
     },
+    [theme.breakpoints.down('sm')]: {
+      display: 'none !important'
+    }
   },
   
   "& .slick-prev": {
@@ -119,6 +121,17 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
       "&.slick-active button:before": {
         color: theme.palette.primary.main,
       }
+    },
+    [theme.breakpoints.down('sm')]: {
+      bottom: -25
+    }
+  },
+  [theme.breakpoints.down('sm')]: {
+    "& .slick-slide": {
+      padding: theme.spacing(0.5),
+      "& > div": {
+        maxWidth: '280px' // Ancho máximo para móviles
+      }
     }
   }
 }));
@@ -135,19 +148,18 @@ const SliderPromociones = () => {
     if (status === "idle") dispatch(fetchPromociones());
   }, [status, dispatch]);
 
-  // Configuración del autoplay
   const settings = {
     dots: true,
     infinite: productosPromocion.length > 1,
     speed: 800,
     slidesToShow: Math.min(isMobile ? 1 : isTablet ? 2 : 4, productosPromocion.length),
     slidesToScroll: isMobile ? 1 : isTablet ? 2 : 4,
-    centerMode: productosPromocion.length >= (isMobile ? 1 : isTablet ? 2 : 4),
-  centerPadding: '0px', // Asegúrate que sea 0 para no tener padding extra
-    autoplay: true, // Habilita el autoplay
-    autoplaySpeed: 5000, // Cambia cada 5 segundos (5000ms)
-    pauseOnHover: true, // Pausa al hacer hover
-    pauseOnFocus: true, // Pausa al enfocar
+    centerMode: true,
+    centerPadding: '0px',
+    autoplay: true,
+    autoplaySpeed: 5000,
+    pauseOnHover: true,
+    pauseOnFocus: true,
     arrows: !isMobile,
     swipe: true,
     swipeToSlide: true,
@@ -157,10 +169,10 @@ const SliderPromociones = () => {
       {
         breakpoint: theme.breakpoints.values.lg,
         settings: {
-                slidesToShow: 3,
-        slidesToScroll: 3,
-        centerMode: true, // Mantén esto en los breakpoints
-        centerPadding: '0px'
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          centerMode: true,
+          centerPadding: '0px'
         }
       },
       {
@@ -168,6 +180,8 @@ const SliderPromociones = () => {
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
+          centerMode: true,
+          centerPadding: '0px',
           arrows: false
         }
       },
@@ -177,8 +191,10 @@ const SliderPromociones = () => {
           slidesToShow: 1,
           slidesToScroll: 1,
           centerMode: true,
+          centerPadding: '20px', // Añade espacio lateral en móviles
           arrows: false,
-          autoplaySpeed: 6000 // Más lento en móviles
+          autoplaySpeed: 6000,
+          dots: true
         }
       }
     ]
@@ -239,7 +255,7 @@ const SliderPromociones = () => {
       component="section"
       sx={{
         py: isMobile ? 4 : 6,
-        px: isMobile ? 1 : 2,
+        px: isMobile ? 0.5 : 2, // Menos padding en móviles
         backgroundColor: 'background.default',
         position: 'relative',
         overflow: 'hidden',
@@ -261,7 +277,8 @@ const SliderPromociones = () => {
           position: 'relative',
           zIndex: 1,
           maxWidth: '1800px',
-          margin: '0 auto'
+          margin: '0 auto',
+          width: '100%'
         }}
       >
         <Typography
@@ -303,16 +320,32 @@ const SliderPromociones = () => {
           Descubre nuestras promociones exclusivas por tiempo limitado
         </Typography>
 
-        <Box sx={{ px: isMobile ? 0 : 2 }}>
+        <Box sx={{ 
+          width: '100%',
+          px: isMobile ? 0 : 2,
+          display: 'flex',
+          justifyContent: 'center',
+          [theme.breakpoints.down('sm')]: {
+            overflow: 'hidden'
+          }
+        }}>
           <StyledSlider {...settings}>
             {productosPromocion.map((producto) => (
               <Box
                 key={producto.id}
                 sx={{
-                  px: 1,
-                  height: "100%",
-                  display: "flex",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  padding: theme.spacing(1),
                   transition: 'transform 0.3s ease',
+                  [theme.breakpoints.down('sm')]: {
+                    padding: theme.spacing(0.5),
+                    "& > div": {
+                      width: '100% !important'
+                    }
+                  },
                   '&:hover': {
                     transform: isMobile ? 'none' : 'translateY(-8px)'
                   }
@@ -322,13 +355,20 @@ const SliderPromociones = () => {
                   producto={producto}
                   isPromocion={true}
                   sx={{ 
-                    height: "100%", 
-                    width: '100%', // Añade esto
-                    maxWidth: '300px', // Establece un ancho máximo si es necesario
-                    flex: 1,
+                    width: '100%',
+                    maxWidth: { xs: '280px', sm: '320px' }, // Tamaños diferentes para móvil/desktop
+                    height: '100%',
+                    margin: '0 auto',
                     boxShadow: theme.shadows[2],
+                    [theme.breakpoints.down('sm')]: {
+                      maxWidth: '280px',
+                      boxShadow: theme.shadows[1]
+                    },
                     '&:hover': {
-                      boxShadow: theme.shadows[4]
+                      boxShadow: theme.shadows[4],
+                      [theme.breakpoints.down('sm')]: {
+                        boxShadow: theme.shadows[2]
+                      }
                     }
                   }}
                 />

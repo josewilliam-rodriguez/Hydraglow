@@ -7,27 +7,58 @@ const ValueItem = ({ icon, title, description }) => {
 
   return (
     <Paper
-      elevation={3}
+      elevation={0}
       sx={{
-        p: 4,
+        p: { xs: 3, sm: 4 },
         height: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         textAlign: "center",
-        borderRadius: "16px",
-        backgroundColor: theme.palette.mode === "dark" ? "#242424" : "#ffffff",
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+        borderRadius: "24px",
+        background: theme.palette.mode === "dark" 
+          ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
+          : "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+        border: theme.palette.mode === "dark"
+          ? "1px solid rgba(255, 255, 255, 0.08)"
+          : "1px solid rgba(0, 0, 0, 0.06)",
+        backdropFilter: "blur(10px)",
+        transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
         mx: "auto",
-        maxWidth: "280px",
-        boxShadow: theme.shadows[3],
-        "&:hover": {
-          transform: "translateY(-6px)",
-          boxShadow: theme.shadows[6],
+        maxWidth: "300px",
+        position: "relative",
+        overflow: "hidden",
+        
+        // Efecto de brillo sutil
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "1px",
+          background: theme.palette.mode === "dark"
+            ? "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)"
+            : "linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)",
         },
+        
+        "&:hover": {
+          transform: "translateY(-8px) scale(1.02)",
+          boxShadow: theme.palette.mode === "dark"
+            ? "0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(255,255,255,0.1)"
+            : "0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.08)",
+          border: theme.palette.mode === "dark"
+            ? "1px solid rgba(255, 255, 255, 0.15)"
+            : "1px solid rgba(0, 0, 0, 0.1)",
+        },
+        
+        "&:active": {
+          transform: "translateY(-4px) scale(1.01)",
+        },
+        
         [theme.breakpoints.down("sm")]: {
-          p: 3,
           maxWidth: "100%",
+          borderRadius: "20px",
         },
       }}
     >
@@ -107,9 +138,17 @@ const CompanyValues = () => {
           Nuestros Valores
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center">
+        {/* OPCIÓN 1: Agregar rowGap al Grid container */}
+        <Grid 
+          container 
+          spacing={4} 
+          justifyContent="center"
+          sx={{ 
+            rowGap: { xs: 8, sm: 10 } // Espacio adicional entre filas
+          }}
+        >
           {values.map((value, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid size={{xs:12, sm:6, m:3}}  key={index}>
               <ValueItem icon={value.icon} title={value.title} description={value.description} />
             </Grid>
           ))}
