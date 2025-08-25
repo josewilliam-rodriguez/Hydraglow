@@ -55,6 +55,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import VideoUploader from './VideoUploader.Jsx';
 
 // Componentes estilizados
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -723,6 +724,12 @@ const BlogsAdmin = () => {
                           borderRadius: '4px'
                         }} 
                       />
+                      <Grid item xs={12}>
+  <VideoUploader 
+    blogId={editingBlog?.id} 
+    existingVideos={editingBlog?.videos || []}
+  />
+</Grid>
                     </Box>
                   )}
                 </Paper>

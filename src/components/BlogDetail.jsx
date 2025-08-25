@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -23,7 +23,10 @@ import {
   ArrowBack as ArrowBackIcon,
   CalendarToday,
   Person,
-  Comment
+  Comment,
+  PlayArrow as PlayIcon,
+  Pause as PauseIcon,
+  Videocam as VideoIcon
 } from '@mui/icons-material';
 
 const BlogDetail = () => {
@@ -31,6 +34,7 @@ const BlogDetail = () => {
   const dispatch = useDispatch();
   const blogs = useSelector(selectAllBlogs);
   const navigate = useNavigate();
+  const [playingVideo, setPlayingVideo] = useState(null);
 
   useEffect(() => {
     dispatch(fetchBlogs());
@@ -39,7 +43,15 @@ const BlogDetail = () => {
   const blog = blogs.find((b) => b.id === id);
 
   const handleGoBack = () => {
-    navigate(-1); // Vuelve a la página anterior
+    navigate(-1);
+  };
+
+  const handleVideoPlay = (index) => {
+    setPlayingVideo(index);
+  };
+
+  const handleVideoPause = () => {
+    setPlayingVideo(null);
   };
 
   if (!blogs.length) {
@@ -164,6 +176,94 @@ const BlogDetail = () => {
               'Sin contenido'
             )}
           </Typography>
+
+          {/* 🎥 Sección de Videos */}
+          {blog.videos && blog.videos.length > 0 && (
+            <>
+              <Divider sx={{ my: 3 }} />
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <VideoIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Typography variant="h5" component="h2">
+                  Videos ({blog.videos.length})
+                </Typography>
+              </Box>
+
+              {blog.videos.map((video, index) => (
+                <Box key={index} sx={{ mb: 4, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                    <VideoIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
+                    {video.title || `Video ${index + 1}`}
+                  </Typography>
+                  
+                  <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                    <video
+                      controls
+                      style={{ 
+                        width: '100%', 
+                        maxHeight: '400px',
+                        borderRadius: '8px',
+                        backgroundColor: '#000'
+                      }}
+                      src={video.url}
+                      poster={blog.imageUrl}
+                      onPlay={() => handleVideoPlay(index)}
+                      onPause={handleVideoPause}
+                    >
+                      Tu navegador no soporta el elemento de video.
+                    </video>
+                    
+                    {playingVideo !== index && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'rgba(0,0,0,0.3)',
+                          borderRadius: '8px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          const videoElement = document.querySelector(`video[src="${video.url}"]`);
+                          if (videoElement) videoElement.play();
+                        }}
+                      >
+                        <IconButton sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.5)', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}>
+                          <PlayIcon fontSize="large" />
+                        </IconButton>
+                      </Box>
+                    )}
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                    <Chip 
+                      label={video.type === 'short' ? 'Video Corto' : 'Video Largo'} 
+                      size="small" 
+                      color="primary" 
+                      variant="outlined" 
+                    />
+                    <Chip 
+                      label={video.duration} 
+                      size="small" 
+                      variant="outlined" 
+                    />
+                    {video.uploadedAt && (
+                      <Chip 
+                        label={`Subido: ${new Date(video.uploadedAt).toLocaleDateString('es-ES')}`} 
+                        size="small" 
+                        variant="outlined" 
+                      />
+                    )}
+                  </Box>
+                </Box>
+              ))}
+            </>
+          )}
 
           <Divider sx={{ mb: 3 }} />
 
