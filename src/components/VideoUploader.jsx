@@ -217,7 +217,7 @@ const VideoUploader = ({ blogId, existingVideos = [] }) => {
       )}
       
       <Typography variant="caption" display="block" color="text.secondary">
-        Formatos: MP4, WebM, OGG, MOV. Máx: 100MB
+        Formatos: MP4, WebM, OGG, MOV. Máx: 100Mb
       </Typography>
     </Box>
   );
