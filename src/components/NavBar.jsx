@@ -63,7 +63,15 @@ const NavBar = () => {
         >
           <ListItemText primary="Productos" />
         </ListItem>
-        
+                <ListItem 
+          component={Link} 
+          to="/Blogs" 
+          onClick={handleDrawerToggle}
+          sx={{ color: 'text.primary' }}
+        >
+          <ListItemText primary="Blogs
+          " />
+        </ListItem>
         {loggedInUser ? (
           <>
             <Divider />
@@ -144,6 +152,20 @@ const NavBar = () => {
                 }}
               >
                 Productos
+              </Button>
+                            <Button
+                component={Link}
+                to="/Blogs"
+                color="inherit"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                Blogs
               </Button>
             </Box>
           )}

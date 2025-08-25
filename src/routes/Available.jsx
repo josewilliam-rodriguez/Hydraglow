@@ -8,16 +8,25 @@ const Registro = lazy(() => import('../components/Registro'))
 const ModalDetailProduc = lazy(() => import('../components/ModalDetailProduc'))
 const SliderHome = lazy (() => import('../components/SliderHome'))
 const SobreNosotros = lazy (() => import('../components/SobreNosotros'))
+const Blogs = lazy (() => import('../components/Blogs'))
+const BlogDetail = lazy (() => import('../components/BlogDetail'))
+
+
 const Available = () => {
   const { loggedInUser } = useSelector(state => state.currentUser);
   return (
     <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/Productos" element={<Productos />} />
+    <Route path='/Blogs' element={<Blogs />} />
+    <Route path='/BlogDetail/:id' element={<BlogDetail />} />
+
     <Route path="/Registro" element={!loggedInUser ? <Registro /> : <Navigate to="/" />} />
     <Route path="/DetalleProductos/:id" element={<ModalDetailProduc />} />
     <Route path='/Promociones' element={<SliderHome/>}/>
     <Route path='/Nosotros' element={<SobreNosotros/>} />
+    
+
 
   </Routes>
 

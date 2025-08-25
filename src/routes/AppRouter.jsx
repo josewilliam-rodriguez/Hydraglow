@@ -37,6 +37,7 @@ typography: {
 const NavBarAdmin = lazy(() => import("../components/NavBarAdmin"));
 const ModalProductoAdmin = lazy(() => import("../components/ModalProductoAdmin"));
 const AdminProductos = lazy(() => import('../components/AdminProductos'))
+const BlogsAdmin = lazy(() => import("../components/BlogsAdmin"))
 
 const AppRouter = () => {
   const loggedInUser = useSelector((state) => state.currentUser.loggedInUser);
@@ -58,6 +59,7 @@ const AppRouter = () => {
             <Route path="/modalAdmin" element={<ModalProductoAdmin />} />
             <Route path="/NavbarAdmin" element={<NavBarAdmin />} />
             <Route path="/AdminProductos" element={<AdminProductos/>}/>
+            <Route path="/BlogsAdmin" element={<BlogsAdmin/>} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" />} />

@@ -79,6 +79,20 @@ const NavBarAdmin = () => {
         >
           <ListItemText primary="Panel Admin" />
         </ListItem>
+        <ListItem
+          onClick={() => {
+            navigate("/BlogsAdmin");
+            setMobileOpen(false);
+          }}
+          sx={{
+            "&:hover": {
+              backgroundColor: "action.hover",
+              cursor: "pointer",
+            },
+          }}
+        >
+          <ListItemText primary="Blogs Admin" />
+        </ListItem>
         
         {/* <ListItem
           onClick={() => {
@@ -182,6 +196,19 @@ const NavBarAdmin = () => {
                 }}
               >
                 Panel ADMIN
+              </Button>
+                            <Button
+                onClick={() => navigate("/BlogsAdmin")}
+                color="inherit"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                Blogs Admin
               </Button>
               
             {isMobile && (  <Button
